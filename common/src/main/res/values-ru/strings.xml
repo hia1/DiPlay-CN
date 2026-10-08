@@ -727,6 +727,7 @@
     <string name="setup_badge_adb">Нужен ADB по сети</string>
     <string name="setup_done_title">Всё готово</string>
     <string name="setup_done_description">Подключите iPhone. Мастер можно снова открыть из настроек.</string>
+    <string name="setup_done_description">Подключите iPhone сейчас. Этот мастер можно снова открыть в настройках.</string>
     <string name="settings_gesture_disabled">Выключено</string>
     <string name="settings_gesture_disabled_hint">Жест смахивания вниз для открытия быстрого меню отключён.</string>
 </resources>

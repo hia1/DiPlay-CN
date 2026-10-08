@@ -727,6 +727,7 @@
     <string name="setup_badge_adb">Requiere ADB por red</string>
     <string name="setup_done_title">Todo listo</string>
     <string name="setup_done_description">Conecta tu iPhone ahora. Podrás abrir esta guía otra vez desde Ajustes.</string>
+    <string name="setup_done_description">Conecta tu iPhone ahora. Puedes volver a abrir esta guía desde Ajustes.</string>
     <string name="settings_gesture_disabled">Desactivado</string>
     <string name="settings_gesture_disabled_hint">El gesto de deslizar hacia abajo está desactivado.</string>
 </resources>
