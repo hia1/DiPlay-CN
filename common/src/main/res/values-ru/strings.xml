@@ -623,6 +623,12 @@
     <string name="call_voice_filter_description">Снижает басы в звонках CarPlay. Может изменить звучание голосов. Применяется при следующем подключении CarPlay.</string>
     <string name="smooth_video">Плавное видео (экспериментально)</string>
     <string name="smooth_video_description">Показывает каждый кадр главного экрана CarPlay по времени, которое отметил на нём iPhone, плюс небольшой запас, а не сразу после декодирования. Запас подстраивается сам, чтобы большинство кадров успевало декодироваться; кадры, всё равно не готовые к своему времени, показываются сразу. Прокрутка может стать ровнее, но отклик на касание запаздывает. Настройки картинки не применяются. Переподключает CarPlay.</string>
+    <string name="settings_direct_video_output">Прямой видеовыход (эксперимент)</string>
+    <string name="settings_direct_video_output_description">Отправляет картинку CarPlay сразу в композитор ГУ вместо отрисовки в окне DiPlay. Может снизить задержку примерно на один кадр. Настройки изображения не применяются. Переподключает CarPlay.</string>
+    <string name="settings_low_latency_decoder">Низколатентное декодирование (эксперимент)</string>
+    <string name="settings_low_latency_decoder_description">Просит декодеры Qualcomm выдавать каждый кадр сразу после декодирования из отдельного потока, не дожидаясь следующего. Может снизить задержку на десятки миллисекунд. Отключите при артефактах или зависаниях. Применится при следующем подключении.</string>
+    <string name="settings_fps_counter">Счётчик FPS</string>
+    <string name="settings_fps_counter_description">Счётчик в правом верхнем углу: показанных кадров в секунду (зелёный от 50, жёлтый от 30, ниже — красный), кадров в секунду от iPhone и время декодирования. На неподвижном экране кадров мало — iPhone их не шлёт.</string>
     <string name="car_button_in_carplay">Кнопка автомобиля в CarPlay</string>
     <string name="car_button_icon">Значок</string>
     <string name="car_button_icon_custom">Свой значок</string>
