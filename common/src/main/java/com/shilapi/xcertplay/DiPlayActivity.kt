@@ -1825,6 +1825,7 @@ class DiPlayActivity : ComponentActivity(), AppAppearanceOwner {
                         val content = AirPlayPersistence.loadClusterContent(this)
                         val customCard = CarPlayClusterDisplay.usesCustomTurnCard(content)
                         var cardPlacementPreview: ClusterCardPlacementPreview? = null
+                        var smallWindowPlacementPreview: ClusterCardPlacementPreview? = null
                         val officialCardOnly = content == CarPlayClusterDisplay.Content.TURN_CARD
                         choice(card, getString(R.string.dashboard_shows), listOf(
                             getString(R.string.dashboard_content_map),
@@ -1857,7 +1858,7 @@ class DiPlayActivity : ComponentActivity(), AppAppearanceOwner {
                         }
                         if (customCard) {
                             card.addView(label(getString(R.string.card_preview_title), 16, TEXT, true))
-                            cardPlacementPreview = ClusterCardPlacementPreview(this).also {
+                            cardPlacementPreview = ClusterCardPlacementPreview(this, ClusterCardPlacementPreview.Mode.FULL).also {
                                 card.addView(it, LinearLayout.LayoutParams(-1, dp(240)))
                             }
                             card.addView(label(getString(R.string.card_preview_note), 14, MUTED))
@@ -1995,19 +1996,22 @@ class DiPlayActivity : ComponentActivity(), AppAppearanceOwner {
                                         ClusterTurnCardOverlay.sizePercents,
                                         AirPlayPersistence.loadClusterSmallWindowCardSizePercent(this),
                                     ) { it -> getString(R.string.turn_card_overlay_size_option, it) }
-                                        .also { it.onSave = { v -> AirPlayPersistence.saveClusterSmallWindowCardSizePercent(this, v); cardPlacementPreview?.invalidate() } })
+                                        .also { it.onSave = { v -> AirPlayPersistence.saveClusterSmallWindowCardSizePercent(this, v); smallWindowPlacementPreview?.invalidate() } })
                                     card.addView(overlaySliderRow(
                                         getString(R.string.cluster_small_window_card_horizontal),
                                         ClusterTurnCardOverlay.smallWindowXPercents,
                                         AirPlayPersistence.loadClusterSmallWindowCardXPercent(this),
                                     ) { it -> overlayOffsetLabel(it, getString(R.string.marker_left), getString(R.string.marker_right), 50) }
-                                        .also { it.onSave = { v -> AirPlayPersistence.saveClusterSmallWindowCardXPercent(this, v); cardPlacementPreview?.invalidate() } })
+                                        .also { it.onSave = { v -> AirPlayPersistence.saveClusterSmallWindowCardXPercent(this, v); smallWindowPlacementPreview?.invalidate() } })
                                     card.addView(overlaySliderRow(
                                         getString(R.string.cluster_small_window_card_vertical),
                                         ClusterTurnCardOverlay.smallWindowYPercents,
                                         AirPlayPersistence.loadClusterSmallWindowCardYPercent(this),
                                     ) { it -> overlayOffsetLabel(it, getString(R.string.marker_up), getString(R.string.marker_down), 40) }
-                                        .also { it.onSave = { v -> AirPlayPersistence.saveClusterSmallWindowCardYPercent(this, v); cardPlacementPreview?.invalidate() } })
+                                        .also { it.onSave = { v -> AirPlayPersistence.saveClusterSmallWindowCardYPercent(this, v); smallWindowPlacementPreview?.invalidate() } })
+                                }
+                                smallWindowPlacementPreview = ClusterCardPlacementPreview(this, ClusterCardPlacementPreview.Mode.SMALL).also {
+                                    card.addView(it, LinearLayout.LayoutParams(-1, dp(240)))
                                 }
                                 card.addView(label(getString(R.string.cluster_small_window_hint), 14, MUTED).apply { setPadding(0, dp(10), 0, 0) })
                             }
