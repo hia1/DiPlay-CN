@@ -638,7 +638,7 @@
     <string name="settings_direct_video_output">Пряме відеовиходу (експеримент)</string>
     <string name="settings_direct_video_output_description">Надсилає картинку CarPlay одразу в композитор ГУ замість малювання у вікні DiPlay. Може зменшити затримку приблизно на один кадр. Налаштування зображення не застосовуються. Перепідключає CarPlay.</string>
     <string name="settings_low_latency_decoder">Низьколатентне декодування (експеримент)</string>
-    <string name="settings_low_latency_decoder_description">Пропонує декодерам Qualcomm видавати кожен кадр одразу після декодування з окремого потоку, не чекаючи наступного. Може зменшити затримку на десятки мілісекунд. Вимкніть за артефактів чи зависань. Застосується при наступному з'єднанні.</string>
+    <string name="settings_low_latency_decoder_description">Пропонує декодерам Qualcomm видавати кожен кадр одразу після декодування з окремого потоку, не чекаючи наступного. Може зменшити затримку на десятки мілісекунд. Вимкніть за артефактів чи зависань. Застосується при наступному з\'єднанні.</string>
     <string name="settings_fps_counter">Лічильник FPS</string>
     <string name="settings_fps_counter_description">Лічильник у правому верхньому куті: показаних кадрів на секунду (зелений від 50, жовтий від 30, нижче — червоний), кадрів на секунду від iPhone і час декодування. На нерухомому екрані кадрів мало — iPhone їх не надсилає.</string>
     <string name="car_button_in_carplay">Кнопка автомобіля в CarPlay</string>
