@@ -732,4 +732,5 @@
     <string name="settings_gesture_disabled_hint">تم تعطيل اختصار السحب لأسفل.</string>
 =======
 >>>>>>> parent of 8859501 (Allow disabling the CarPlay swipe-down settings gesture)
+    <string name="cluster_small_window_card_opacity">بطاقة المنعطف في النافذة الصغيرة · الشفافية</string>
 </resources>

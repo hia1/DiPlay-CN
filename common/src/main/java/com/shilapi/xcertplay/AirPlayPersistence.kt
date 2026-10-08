@@ -140,6 +140,7 @@ object AirPlayPersistence {
 
     private const val KEY_CLUSTER_TURN_CARD_OVERLAY_SIZE_PERCENT = "cluster_turn_card_overlay_size_percent"
     private const val KEY_CLUSTER_TURN_CARD_OPACITY = "cluster_turn_card_opacity_percent"
+    private const val KEY_CLUSTER_SMALL_WINDOW_CARD_OPACITY = "cluster_small_window_card_opacity_percent"
     private const val KEY_CLUSTER_TURN_CARD_THEME = "cluster_turn_card_theme"
     private const val KEY_CLUSTER_SMALL_WINDOW_CARD_THEME = "cluster_small_window_card_theme"
     private const val KEY_CLUSTER_SMALL_WINDOW_MARKER = "cluster_small_window_marker"
@@ -1239,9 +1240,18 @@ object AirPlayPersistence {
         context.getSharedPreferences(PREFS, Context.MODE_PRIVATE)
             .getInt(KEY_CLUSTER_TURN_CARD_OPACITY, 85).coerceIn(20, 100)
 
-    fun saveClusterTurnCardOpacityPercent(context: Context, percent: Int) {
+    /** The small-window card falls back to the shared opacity until it gets its own value. */
+    fun loadClusterSmallWindowCardOpacityPercent(context: Context): Int {
+        val prefs = context.getSharedPreferences(PREFS, Context.MODE_PRIVATE)
+        if (prefs.contains(KEY_CLUSTER_SMALL_WINDOW_CARD_OPACITY)) {
+            return prefs.getInt(KEY_CLUSTER_SMALL_WINDOW_CARD_OPACITY, 85).coerceIn(20, 100)
+        }
+        return loadClusterTurnCardOpacityPercent(context)
+    }
+
+    fun saveClusterSmallWindowCardOpacityPercent(context: Context, percent: Int) {
         context.getSharedPreferences(PREFS, Context.MODE_PRIVATE).edit()
-            .putInt(KEY_CLUSTER_TURN_CARD_OPACITY, percent.coerceIn(20, 100)).apply()
+            .putInt(KEY_CLUSTER_SMALL_WINDOW_CARD_OPACITY, percent.coerceIn(20, 100)).apply()
         overlaySettingsListener?.invoke()
     }
 

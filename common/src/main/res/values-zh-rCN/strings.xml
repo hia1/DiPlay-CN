@@ -792,4 +792,5 @@
     <string name="settings_gesture_disabled_hint">已关闭向下滑动打开快捷菜单的手势。</string>
 =======
 >>>>>>> parent of 8859501 (Allow disabling the CarPlay swipe-down settings gesture)
+    <string name="cluster_small_window_card_opacity">小屏转向卡 · 透明度</string>
 </resources>

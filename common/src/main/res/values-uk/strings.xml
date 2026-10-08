@@ -744,4 +744,5 @@
     <string name="settings_gesture_disabled_hint">Жест проведення вниз для відкриття швидкого меню вимкнено.</string>
 =======
 >>>>>>> parent of 8859501 (Allow disabling the CarPlay swipe-down settings gesture)
+    <string name="cluster_small_window_card_opacity">Картка маневру в міні-вікні · прозорість</string>
 </resources>

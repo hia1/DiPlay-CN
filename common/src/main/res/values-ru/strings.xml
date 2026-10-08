@@ -732,4 +732,5 @@
     <string name="settings_gesture_disabled_hint">Жест смахивания вниз для открытия быстрого меню отключён.</string>
 =======
 >>>>>>> parent of 8859501 (Allow disabling the CarPlay swipe-down settings gesture)
+    <string name="cluster_small_window_card_opacity">Карточка манёвра в мини-окне · прозрачность</string>
 </resources>

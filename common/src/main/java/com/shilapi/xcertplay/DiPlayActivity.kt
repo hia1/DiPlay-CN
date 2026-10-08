@@ -2119,7 +2119,7 @@ class DiPlayActivity : ComponentActivity(), AppAppearanceOwner {
     private fun about(content: LinearLayout) {
         content.addView(label(getString(R.string.diplay), 40, TEXT, true))
         content.addView(label(getString(R.string.carplay_at_home_in_your_car), 20, MUTED).apply { setPadding(0, dp(8), 0, dp(24)) })
-        section(content, getString(R.string.about_public_preview_prefix, version())) { card ->
+        section(aboutLeft, getString(R.string.about_public_preview_prefix, version())) { card ->
             card.addView(label(getString(R.string.an_independent_carplay_receiver_for_android_head_units_wir), 17, TEXT))
             val updateStatus = label(AppUpdate.currentVersion(this), 15, MUTED).apply {
                 setPadding(0, dp(10), 0, 0)
@@ -2163,12 +2163,30 @@ class DiPlayActivity : ComponentActivity(), AppAppearanceOwner {
                 }
             }, matchButton(10, 56))
         }
-        section(content, getString(R.string.cn_features_title)) { card ->
+        val aboutTwoColumns = isExpandedSettingsLayout && resources.configuration.let {
+            SettingsLayoutPolicy.overviewHasTwoColumns(it.screenWidthDp, it.fontScale)
+        }
+        val aboutLeft = if (aboutTwoColumns) column() else content
+        val aboutRight = if (aboutTwoColumns) column() else content
+        if (aboutTwoColumns) {
+            val columns = row().apply { gravity = Gravity.TOP }
+            columns.addView(aboutLeft, LinearLayout.LayoutParams(0, -2, 1f))
+            columns.addView(space(14), LinearLayout.LayoutParams(dp(14), 1))
+            columns.addView(aboutRight, LinearLayout.LayoutParams(0, -2, 1f))
+            content.addView(columns, LinearLayout.LayoutParams(-1, -2))
+        }
+        section(aboutRight, getString(R.string.cn_features_title)) { card ->
             card.addView(label(getString(R.string.cn_features_body), 16, TEXT).apply {
                 setPadding(0, 0, 0, dp(8))
             })
+                                    card.addView(overlaySliderRow(
+                                        getString(R.string.cluster_small_window_card_opacity),
+                                        ClusterTurnCardOverlay.opacityPercents,
+                                        AirPlayPersistence.loadClusterSmallWindowCardOpacityPercent(this),
+                                        ) { it -> getString(R.string.turn_card_overlay_opacity_option, it) }
+                                            .also { it.onSave = { v -> AirPlayPersistence.saveClusterSmallWindowCardOpacityPercent(this, v) } })
         }
-        section(content, getString(R.string.cn_changelog_title)) { card ->
+        section(aboutRight, getString(R.string.cn_changelog_title)) { card ->
             card.addView(label(cnChangelogText(), 15, MUTED))
         }
         section(content, getString(R.string.made_possible_by_open_source)) { card ->
