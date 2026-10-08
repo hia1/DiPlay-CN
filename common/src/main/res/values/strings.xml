@@ -824,4 +824,5 @@
     <string name="setup_badge_adb">Needs ADB over network</string>
     <string name="setup_done_title">You’re ready</string>
     <string name="setup_done_description">Connect your iPhone now. You can open this guide again from Settings.</string>
+    <string name="cluster_small_window_card_opacity">Small-window turn card · opacity</string>
 </resources>

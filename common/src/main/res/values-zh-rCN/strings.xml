@@ -787,4 +787,10 @@
     <string name="setup_badge_adb">需要网络 ADB</string>
     <string name="setup_done_title">一切就绪</string>
     <string name="setup_done_description">现在连接你的 iPhone。之后可随时从设置再次打开向导。</string>
+<<<<<<< HEAD
+    <string name="settings_gesture_disabled">关闭</string>
+    <string name="settings_gesture_disabled_hint">已关闭向下滑动打开快捷菜单的手势。</string>
+=======
+>>>>>>> parent of 8859501 (Allow disabling the CarPlay swipe-down settings gesture)
+    <string name="cluster_small_window_card_opacity">小屏转向卡 · 透明度</string>
 </resources>
