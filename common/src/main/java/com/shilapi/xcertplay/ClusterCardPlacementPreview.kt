@@ -11,7 +11,7 @@ import com.shilapi.xcertplay.host.R
 import kotlin.math.min
 
 /** A proportional placement sketch: one diagram per card so each position reads alone. */
-internal class ClusterCardPlacementPreview(context: Context, private val mode: Mode = Mode.BOTH) : View(context) {
+internal class ClusterCardPlacementPreview(context: Context, private val mode: Mode = Mode.FULL) : View(context) {
     enum class Mode { FULL, SMALL }
     private val stroke = Paint(Paint.ANTI_ALIAS_FLAG).apply {
         color = Color.rgb(160, 171, 193)
@@ -62,7 +62,7 @@ internal class ClusterCardPlacementPreview(context: Context, private val mode: M
             val wx = (AirPlayPersistence.loadClusterSmallWindowCardXPercent(context) / 100f * windowWidth)
             val wy = (AirPlayPersistence.loadClusterSmallWindowCardYPercent(context) / 100f * panelHeight)
             val cardH = ClusterTurnCardOverlay.card(1000, 1000, 50, 50,
-                AirPlayPersistence.loadClusterSmallWindowCardSizePercent(context)).height() * (windowWidth / 1000f)
+                AirPlayPersistence.loadClusterSmallWindowCardSizePercent(context)).height * (windowWidth / 1000f)
             val cardW = cardH * 2.64f
             canvas.drawRoundRect(RectF(windowLeft + wx - cardW / 2, top + wy - cardH / 2,
                 windowLeft + wx + cardW / 2, top + wy + cardH / 2), 5f * density, 5f * density, small)
