@@ -727,10 +727,5 @@
     <string name="setup_badge_adb">Requiere ADB por red</string>
     <string name="setup_done_title">Todo listo</string>
     <string name="setup_done_description">Conecta tu iPhone ahora. Podrás abrir esta guía otra vez desde Ajustes.</string>
-<<<<<<< HEAD
-    <string name="settings_gesture_disabled">Desactivado</string>
-    <string name="settings_gesture_disabled_hint">El gesto de deslizar hacia abajo está desactivado.</string>
-=======
->>>>>>> parent of 8859501 (Allow disabling the CarPlay swipe-down settings gesture)
     <string name="cluster_small_window_card_opacity">Tarjeta de giro en miniatura · opacidad</string>
 </resources>
