@@ -77,15 +77,15 @@
     <string name="status_attaching_ncm">Підключення мережі NCM/AirPlay</string>
     <string name="status_failed">Помилка: %1$s</string>
     <string name="msg_car_hotspot_off">Точку доступу автомобіля «%1$s» вимкнено. Увімкніть її в налаштуваннях автомобіля перед підключенням.</string>
-    <string name="home_public_preview">ПУБЛІЧНЕ ПРЕВ’Ю  ·\u0020\u0020</string>
+    <string name="home_public_preview">ПУБЛІЧНЕ ПРЕВ’Ю  ·\u0020\u0020%1$s</string>
     <string name="choose_iphone_prefix">Вибрати iPhone ·\u0020</string>
     <string name="audio_saved_value">Збережено: %1$d</string>
-    <string name="about_public_preview_prefix">Попередня версія ·\u0020</string>
+    <string name="about_public_preview_prefix">Попередня версія ·\u0020%1$s</string>
     <string name="msg_car_hotspot_connect">Lodestar підключається через точку доступу автомобіля «%1$s». Увімкніть її в налаштуваннях автомобіля, а потім підключіться.</string>
     <string name="edit_saved_hotspot_prefix">Змінити збережену точку доступу ·\u0020</string>
     <string name="cluster_adb_multi_device">Якщо ADB показує кілька пристроїв, виконайте adb -s &lt;car-device-ID&gt; shell appops set %1$s GET_USAGE_STATS allow. Ідентифікатор можна знайти командою adb devices.</string>
     <string name="status_ready_for_prefix">Готово до підключення:\u0020</string>
-    <string name="audio_stream_unavailable">Аудіопотік типу %1$d тут недоступний (стан=%2$s)</string>
+    <string name="audio_stream_unavailable">Аудіопотік типу %1$d тут недоступний (стан=%2$d)</string>
     <string name="resolution_handshake_prefix">Роздільна здатність узгодження:\u0020</string>
     <string name="safe_area_full_screen_at">Безпечна область: увесь екран,\u0020</string>
     <string name="safe_area_mapping_summary">Безпечна область: %1$d x %2$d у точці (%3$d, %4$d) на екрані %5$d x %6$d</string>
@@ -540,7 +540,7 @@
     <string name="turn_card_overlay_medium">Середня</string>
     <string name="turn_card_overlay_large">Велика</string>
     <string name="reset_turn_card_overlay">Скинути положення власної картки</string>
-    <string name="turn_card_overlay_note">Lodestar малює цю картку поверх карти; переміщення кроками 2 %. Скляну картку iOS не можна рухати окремо. Зміни застосовуються одразу; картка лишається й під час руху прямо.</string>
+    <string name="turn_card_overlay_note" formatted="false">Lodestar малює цю картку поверх карти; переміщення кроками 2 %. Скляну картку iOS не можна рухати окремо. Зміни застосовуються одразу; картка лишається й під час руху прямо.</string>
     <string name="turn_card_now">Зараз</string>
     <string name="turn_card_distance_m">%1$d м</string>
     <string name="turn_card_distance_km">%1$.1f км</string>

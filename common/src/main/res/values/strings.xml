@@ -76,15 +76,15 @@
     <string name="status_attaching_ncm">Attaching NCM/AirPlay network</string>
     <string name="status_failed">Failed: %1$s</string>
     <string name="msg_car_hotspot_off">The car hotspot “%1$s” is off. Turn it on in the car settings before connecting.</string>
-    <string name="home_public_preview">PUBLIC PREVIEW  ·\u0020\u0020</string>
+    <string name="home_public_preview">PUBLIC PREVIEW  ·\u0020\u0020%1$s</string>
     <string name="choose_iphone_prefix">Choose iPhone ·\u0020</string>
     <string name="audio_saved_value">Saved: %1$d</string>
-    <string name="about_public_preview_prefix">Public preview ·\u0020</string>
+    <string name="about_public_preview_prefix">Public preview ·\u0020%1$s</string>
     <string name="msg_car_hotspot_connect">Lodestar connects through the car hotspot “%1$s”. Turn it on in the car settings, then connect.</string>
     <string name="edit_saved_hotspot_prefix">Edit saved hotspot ·\u0020</string>
     <string name="cluster_adb_multi_device">If ADB lists several devices, use adb -s &lt;car-device-ID&gt; shell appops set %1$s GET_USAGE_STATS allow. Find the ID with adb devices.</string>
     <string name="status_ready_for_prefix">Ready for\u0020</string>
-    <string name="audio_stream_unavailable">Stream type %1$d is unavailable here (state=%2$s)</string>
+    <string name="audio_stream_unavailable">Stream type %1$d is unavailable here (state=%2$d)</string>
     <string name="resolution_handshake_prefix">Handshake resolution:\u0020</string>
     <string name="safe_area_full_screen_at">Safe area: full screen at\u0020</string>
     <string name="safe_area_mapping_summary">Safe area: %1$d x %2$d at (%3$d, %4$d) in %5$d x %6$d</string>
@@ -486,7 +486,7 @@
     <string name="turn_card_overlay_medium">Medium</string>
     <string name="turn_card_overlay_large">Large</string>
     <string name="reset_turn_card_overlay">Reset custom turn card position</string>
-    <string name="turn_card_overlay_note">Lodestar draws this card on the map. Move it in 2 % steps. The iOS glass card cannot be moved on its own. Changes apply without reconnecting. The custom card stays on for straight-ahead as well as turns.</string>
+    <string name="turn_card_overlay_note" formatted="false">Lodestar draws this card on the map. Move it in 2 % steps. The iOS glass card cannot be moved on its own. Changes apply without reconnecting. The custom card stays on for straight-ahead as well as turns.</string>
     <string name="turn_card_now">Now</string>
     <string name="turn_card_distance_m">%1$d m</string>
     <string name="turn_card_distance_km">%1$.1f km</string>

@@ -98,6 +98,8 @@ class WifiP2pGroupManager(
         } catch (error: InterruptedException) {
             Thread.currentThread().interrupt()
             "p2pGroup=interrupted association=unknown"
+        } catch (error: SecurityException) {
+            "p2pGroup=permission_denied association=unknown"
         } catch (error: RuntimeException) {
             "p2pGroup=unavailable failureClass=${error.javaClass.simpleName} association=unknown"
         }
@@ -242,6 +244,9 @@ class WifiP2pGroupManager(
                             if (configurationMemory.forget(preferred)) diagnostic("Wi-Fi P2P remembered cleared=create_rejected")
                         }
                         throw failure
+                    } catch (error: SecurityException) {
+                        diagnostic("Wi-Fi P2P create denied failureClass=${error.javaClass.simpleName}")
+                        throw P2pCreateRejected(WifiP2pManager.NO_PERMISSION, "Wi-Fi Direct permission denied")
                     }
                 },
             )
@@ -450,6 +455,8 @@ class WifiP2pGroupManager(
                 return
             }
             clearLegacyChannelRestriction(channel)
+        } catch (failure: SecurityException) {
+            diagnostic("Wi-Fi P2P legacy channel cleanup denied failureClass=${failure.javaClass.simpleName}")
         } catch (failure: Exception) {
             diagnostic("Wi-Fi P2P legacy channel cleanup failed failureClass=${failure.javaClass.simpleName}")
         } finally {
@@ -648,15 +655,21 @@ class WifiP2pGroupManager(
     ): WifiP2pGroup? {
         val result = AtomicReference<WifiP2pGroup?>()
         val latch = CountDownLatch(1)
-        p2pManager.requestGroupInfo(channel) {
-            // Keep the first identity returned after our successful creation. A later global
-            // broadcast may describe a replacement group belonging to another app.
-            if (attempt.createSucceeded && observedCreatedName == null && it?.isGroupOwner == true &&
-                (requestedName == null || it.networkName == requestedName)) {
-                observedCreatedName = it.networkName
+        try {
+            p2pManager.requestGroupInfo(channel) {
+                // Keep the first identity returned after our successful creation. A later global
+                // broadcast may describe a replacement group belonging to another app.
+                if (attempt.createSucceeded && observedCreatedName == null && it?.isGroupOwner == true &&
+                    (requestedName == null || it.networkName == requestedName)) {
+                    observedCreatedName = it.networkName
+                }
+                result.set(it)
+                latch.countDown()
             }
-            result.set(it)
-            latch.countDown()
+        } catch (error: SecurityException) {
+            diagnostic("Wi-Fi P2P group query denied failureClass=${error.javaClass.simpleName}")
+            if (requireResponse) throw IOException("Wi-Fi Direct permission denied", error)
+            return null
         }
         if (!await(latch, timeoutNanos)) {
             if (requireResponse) throw IOException("Wi-Fi Direct did not respond")
@@ -881,6 +894,9 @@ class WifiP2pGroupManager(
                     }
                 })
             }
+        } catch (failure: SecurityException) {
+            Log.w(TAG, "Wi-Fi P2P removeGroup denied", failure)
+            latch.countDown()
         } catch (failure: RuntimeException) {
             Log.w(TAG, "Wi-Fi P2P removeGroup could not be issued", failure)
             latch.countDown()

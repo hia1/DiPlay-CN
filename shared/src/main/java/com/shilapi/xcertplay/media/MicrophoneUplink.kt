@@ -151,6 +151,10 @@ internal class MicrophoneUplink(
                 )
                 .setBufferSizeInBytes(bufferSize)
                 .build()
+        } catch (error: SecurityException) {
+            Log.e(TAG, "microphone permission denied source=$source", error)
+            stats.failure(MicrophoneFailureStage.RECORDER_CREATION, error)
+            return null
         } catch (error: Exception) {
             Log.e(TAG, "microphone recorder creation failed source=$source", error)
             stats.failure(MicrophoneFailureStage.RECORDER_CREATION, error)

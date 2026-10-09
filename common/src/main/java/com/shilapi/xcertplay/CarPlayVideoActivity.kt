@@ -1,5 +1,6 @@
 package com.shilapi.xcertplay
 
+import android.annotation.SuppressLint
 import android.app.Activity
 import android.content.res.ColorStateList
 import android.graphics.Color
@@ -315,6 +316,8 @@ class CarPlayVideoActivity : Activity() {
     private fun causes(error: Throwable): String = generateSequence(error) { it.cause }.take(4)
         .joinToString(" <- ") { "${it.javaClass.simpleName}(${it.message?.replace(Regex("\\w+://\\S+"), "<url>")})" }
 
+    // ACCESS_NETWORK_STATE is an install-time normal permission, so it is always granted to this app.
+    @SuppressLint("MissingPermission")
     private fun playbackNetworkSummary(): String {
         val manager = getSystemService(ConnectivityManager::class.java)
         val network = manager?.activeNetwork

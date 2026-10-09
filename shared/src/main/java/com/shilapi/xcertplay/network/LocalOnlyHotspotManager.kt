@@ -1,5 +1,6 @@
 package com.shilapi.xcertplay.network
 
+import android.annotation.SuppressLint
 import android.content.Context
 import android.net.ConnectivityManager
 import android.net.wifi.SoftApConfiguration
@@ -175,6 +176,10 @@ class LocalOnlyHotspotManager(context: Context, private val onDiagnostic: (Strin
      * for, or null when the platform got the plain Android-generated AP. The caller uses
      * the returned channel as the advertised fallback when no live radio reading exists.
      */
+    // SoftApConfiguration is API 30+, and the custom-configuration path below is already limited to
+    // the firmware that accepts it (Android 13 and 16+). Lint cannot model the `== 33 || >= 36`
+    // predicate, so the NewApi check is suppressed for this guarded block.
+    @SuppressLint("NewApi")
     private fun requestHotspot(callback: WifiManager.LocalOnlyHotspotCallback): Int? {
         // Android 13's service accepts a custom LOHS configuration from target-33+ callers
         // with Nearby devices permission. BYD's Android 12 builds expose the same entry
@@ -221,7 +226,11 @@ class LocalOnlyHotspotManager(context: Context, private val onDiagnostic: (Strin
             }
         }
         // Main-loop callback delivery survives cancellation to close late reservations.
-        wifiManager.startLocalOnlyHotspot(callback, main)
+        try {
+            wifiManager.startLocalOnlyHotspot(callback, main)
+        } catch (error: SecurityException) {
+            throw IOException("LocalOnlyHotspot permission denied", error)
+        }
         return null
     }
 

@@ -21,6 +21,7 @@ import android.os.IBinder
 import android.os.Looper
 import android.provider.Settings
 import android.util.Log
+import com.shilapi.xcertplay.PlatformPermissions
 import com.shilapi.xcertplay.airplay.AirPlayListenerIdentity
 import com.shilapi.xcertplay.airplay.AirPlayTcpAccepted
 import com.shilapi.xcertplay.airplay.AirPlayConfig
@@ -1232,8 +1233,8 @@ class CarPlayController(
             val device = selectWirelessBluetoothDevice(adapter)
             val hostBluetoothMac = accessoryBluetoothMac(adapter)
             debugLog(
-                "wireless selected Bluetooth target name=${device.name ?: "unknown"} " +
-                    "address=${device.address} localBt=$hostBluetoothMac",
+                "wireless selected Bluetooth target name=${PlatformPermissions.deviceName(device) ?: "unknown"} " +
+                    "address=${PlatformPermissions.deviceAddress(device) ?: "unknown"} localBt=$hostBluetoothMac",
             )
             val wirelessAirPlayConfig = airPlayConfig.copy(
                 deviceId = deviceIdentifier,
@@ -2193,13 +2194,15 @@ class CarPlayController(
     }
 
     private fun selectWirelessBluetoothDevice(adapter: BluetoothAdapter): BluetoothDevice {
-        val bonded = adapter.bondedDevices.orEmpty()
+        val bonded = PlatformPermissions.bondedDevices(adapter)
         config.wirelessBluetoothDeviceAddress?.let { selected ->
-            return bonded.firstOrNull { it.address.equals(selected, ignoreCase = true) }
+            return bonded.firstOrNull {
+                PlatformPermissions.deviceAddress(it)?.equals(selected, ignoreCase = true) == true
+            }
                 ?: throw IOException("The selected iPhone is no longer paired. Choose it again in DiPlay.")
         }
         val iPhones = bonded.filter { device ->
-            device.name?.contains("iPhone", ignoreCase = true) == true
+            PlatformPermissions.deviceName(device)?.contains("iPhone", ignoreCase = true) == true
         }
         val directlyConnectedIPhones = iPhones.filter(::isBluetoothDeviceConnected)
         Log.i(
@@ -2210,16 +2213,17 @@ class CarPlayController(
         val connectedIPhones = if (directlyConnectedIPhones.isNotEmpty()) {
             directlyConnectedIPhones
         } else {
-            val connectedAddresses = connectedBluetoothDevices(adapter).mapTo(mutableSetOf()) {
-                it.address
-            }
-            iPhones.filter { it.address in connectedAddresses }
+            val connectedAddresses = connectedBluetoothDevices(adapter)
+                .mapNotNullTo(mutableSetOf()) { PlatformPermissions.deviceAddress(it) }
+            iPhones.filter { PlatformPermissions.deviceAddress(it) in connectedAddresses }
         }
         if (connectedIPhones.size == 1) return connectedIPhones.single()
         if (connectedIPhones.size > 1) {
             throw IOException(
                 "Multiple connected iPhones found: " +
-                    connectedIPhones.joinToString { "${it.name ?: "iPhone"} (${it.address})" },
+                    connectedIPhones.joinToString {
+                        "${PlatformPermissions.deviceName(it) ?: "iPhone"} (${PlatformPermissions.deviceAddress(it)})"
+                    },
             )
         }
         if (iPhones.size == 1) return iPhones.single()
@@ -2390,11 +2394,7 @@ class CarPlayController(
 
     @Suppress("DEPRECATION")
     private fun accessoryBluetoothMac(adapter: BluetoothAdapter): String {
-        val address = try {
-            adapter.address
-        } catch (_: SecurityException) {
-            null
-        }
+        val address = PlatformPermissions.adapterAddress(adapter)
         val settingsAddress = try {
             Settings.Secure.getString(appContext.contentResolver, "bluetooth_address")
         } catch (_: SecurityException) {

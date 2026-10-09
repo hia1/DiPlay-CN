@@ -3,6 +3,7 @@
 package com.shilapi.xcertplay
 
 import android.Manifest
+import android.annotation.SuppressLint
 import android.app.AlertDialog
 import android.app.Dialog
 import android.app.TimePickerDialog
@@ -3349,6 +3350,8 @@ class DiPlayActivity : ComponentActivity(), AppAppearanceOwner {
         applyPendingAppearanceRender()
     }
 
+    // ComponentActivity marks dispatchKeyEvent as a restricted override; taking it is deliberate here.
+    @SuppressLint("RestrictedApi")
     override fun dispatchKeyEvent(event: KeyEvent): Boolean {
         if (event.action != KeyEvent.ACTION_DOWN && event.action != KeyEvent.ACTION_UP) return super.dispatchKeyEvent(event)
         val action = windowLearningPresses.filter(
@@ -4603,7 +4606,7 @@ class DiPlayActivity : ComponentActivity(), AppAppearanceOwner {
                 .setPositiveButton(getString(R.string.open_bluetooth)) { _, _ -> openSystem(Intent(Settings.ACTION_BLUETOOTH_SETTINGS)) }
                 .setNegativeButton(getString(R.string.later), null).show(); return
         }
-        val devices = runCatching { adapter.bondedDevices.sortedBy { it.name ?: "" } }.getOrDefault(emptyList())
+        val devices = PlatformPermissions.bondedDevices(adapter).sortedBy { PlatformPermissions.deviceName(it) ?: "" }
         if (devices.isEmpty()) {
             appDialogBuilder().setTitle(getString(R.string.pair_your_iphone))
                 .setMessage(getString(R.string.on_your_iphone_open_settings_bluetooth_and_pair_with_the_c))
@@ -4612,11 +4615,17 @@ class DiPlayActivity : ComponentActivity(), AppAppearanceOwner {
         }
         appDialogBuilder().setTitle(getString(R.string.choose_your_iphone))
             .setItems(devices.map { device ->
-                val name = device.name ?: getString(R.string.paired_device)
-                if (devices.count { it.name == device.name } > 1) "$name · ${device.address.takeLast(5)}" else name
+                val name = PlatformPermissions.deviceName(device) ?: getString(R.string.paired_device)
+                val duplicate = devices.count {
+                    PlatformPermissions.deviceName(it) == PlatformPermissions.deviceName(device)
+                } > 1
+                if (duplicate) "$name · ${PlatformPermissions.deviceAddress(device)?.takeLast(5).orEmpty()}" else name
             }.toTypedArray()) { _, index ->
                 val device = devices[index]
-                DiPlayPreferences.savePhone(this, device.address, device.name ?: "iPhone")
+                val address = PlatformPermissions.deviceAddress(device)
+                if (address != null) {
+                    DiPlayPreferences.savePhone(this, address, PlatformPermissions.deviceName(device) ?: "iPhone")
+                }
                 val start = pendingWireless; pendingWireless = false
                 render()
                 if (start) connect(true)
@@ -4647,9 +4656,16 @@ class DiPlayActivity : ComponentActivity(), AppAppearanceOwner {
             }.setNegativeButton(getString(R.string.cancel), null).show()
     }
 
+    // requestGroupInfo needs NEARBY_WIFI_DEVICES on 13+; the runtime gate below covers that and the
+    // SecurityException catch keeps older firmware (location permission) from crashing the reset.
+    @SuppressLint("MissingPermission")
     private fun resetWirelessGroup() {
         val manager = getSystemService(android.net.wifi.p2p.WifiP2pManager::class.java)
         if (manager == null) { toast(getString(R.string.this_head_unit_does_not_support_wi_fi_direct)); return }
+        if (!PlatformPermissions.nearbyWifiDevices(this)) {
+            permissionHelp(getString(R.string.wireless_permissions), getString(R.string.allow_nearby_devices_and_on_older_android_versions_locatio))
+            return
+        }
         val channel = manager.initialize(this, mainLooper, null)
         try {
             manager.requestGroupInfo(channel) { group ->

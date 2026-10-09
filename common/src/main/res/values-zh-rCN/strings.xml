@@ -76,15 +76,15 @@
     <string name="status_attaching_ncm">正在连接 NCM/AirPlay 网络</string>
     <string name="status_failed">失败：%1$s</string>
     <string name="msg_car_hotspot_off">车机热点“%1$s”未开启。请在车机设置中开启后再连接。</string>
-    <string name="home_public_preview">公开预览  ·\u0020\u0020</string>
+    <string name="home_public_preview">公开预览  ·\u0020\u0020%1$s</string>
     <string name="choose_iphone_prefix">选择 iPhone ·\u0020</string>
     <string name="audio_saved_value">已保存：%1$d</string>
-    <string name="about_public_preview_prefix">公开预览 ·\u0020</string>
+    <string name="about_public_preview_prefix">公开预览 ·\u0020%1$s</string>
     <string name="msg_car_hotspot_connect">Lodestar 通过车机热点“%1$s”连接。请在车机设置中开启热点后连接。</string>
     <string name="edit_saved_hotspot_prefix">编辑已保存的热点 ·\u0020</string>
     <string name="cluster_adb_multi_device">如果 ADB 列出多个设备，请使用 adb -s &lt;car-device-ID&gt; shell appops set %1$s GET_USAGE_STATS allow。用 adb devices 查询 ID。</string>
     <string name="status_ready_for_prefix">已准备连接：</string>
-    <string name="audio_stream_unavailable">流类型 %1$d 在此不可用（状态=%2$s）</string>
+    <string name="audio_stream_unavailable">流类型 %1$d 在此不可用（状态=%2$d）</string>
     <string name="resolution_handshake_prefix">握手分辨率：</string>
     <string name="safe_area_full_screen_at">安全区域：全屏，</string>
     <string name="settings_android9_compat">以下设置在 Android 9（API 28）上不可用且已隐藏：\n• Wi-Fi P2P（5 GHz）— 将改用 LocalOnlyHotspot。\n• HEVC 软解码器 — 将改用硬件解码。</string>
@@ -448,7 +448,7 @@
     <string name="turn_card_overlay_medium">中</string>
     <string name="turn_card_overlay_large">大</string>
     <string name="reset_turn_card_overlay">重置自定义转向卡位置</string>
-    <string name="turn_card_overlay_note">此卡由 Lodestar 叠在地图上，可按 2% 步进移动。iOS 玻璃卡无法单独挪动。更改后立即生效。有导航时直行也会显示。</string>
+    <string name="turn_card_overlay_note" formatted="false">此卡由 Lodestar 叠在地图上，可按 2% 步进移动。iOS 玻璃卡无法单独挪动。更改后立即生效。有导航时直行也会显示。</string>
     <string name="turn_card_now">即将转向</string>
     <string name="turn_card_distance_m">%1$d 米</string>
     <string name="turn_card_distance_km">%1$.1f 公里</string>

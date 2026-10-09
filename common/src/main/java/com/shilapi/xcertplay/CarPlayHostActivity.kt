@@ -1,6 +1,7 @@
 package com.shilapi.xcertplay
 
 import android.Manifest
+import android.annotation.SuppressLint
 import android.content.Context
 import android.content.Intent
 import android.content.pm.PackageManager
@@ -1234,6 +1235,8 @@ class CarPlayHostActivity : ComponentActivity() {
     }
 
     // Hardware navigation belongs to the iPhone-rendered CarPlay UI, not Android View focus.
+    // ComponentActivity marks dispatchKeyEvent as a restricted override; taking it is deliberate here.
+    @SuppressLint("RestrictedApi")
     override fun dispatchKeyEvent(event: KeyEvent): Boolean {
         val physicalKey = Triple(event.deviceId, event.keyCode, event.scanCode)
         val downOrUp = event.action == KeyEvent.ACTION_DOWN || event.action == KeyEvent.ACTION_UP
@@ -3906,8 +3909,15 @@ class CarPlayHostActivity : ComponentActivity() {
                 runCatching {
                     adapter.getProfileProxy(applicationContext, object : android.bluetooth.BluetoothProfile.ServiceListener {
                         override fun onServiceConnected(id: Int, proxy: android.bluetooth.BluetoothProfile) {
-                            val devices = runCatching { proxy.connectedDevices.map { it.name ?: "?" } }
-                                .getOrElse { listOf("unreadable:${it.javaClass.simpleName}") }
+                            val devices = runCatching {
+                                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S &&
+                                    checkSelfPermission(Manifest.permission.BLUETOOTH_CONNECT) != PackageManager.PERMISSION_GRANTED
+                                ) {
+                                    listOf("permission")
+                                } else {
+                                    proxy.connectedDevices.map { PlatformPermissions.deviceName(it) ?: "?" }
+                                }
+                            }.getOrElse { listOf("unreadable:${it.javaClass.simpleName}") }
                             appendLog("Car Bluetooth audio: $moment $name connected=$devices")
                             adapter.closeProfileProxy(id, proxy)
                         }

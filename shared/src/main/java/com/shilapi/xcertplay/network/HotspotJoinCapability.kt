@@ -1,6 +1,8 @@
 package com.shilapi.xcertplay.network
 
+import android.annotation.SuppressLint
 import android.os.Binder
+import android.os.Build
 import android.os.IBinder
 import android.os.IInterface
 import android.os.Parcel
@@ -33,6 +35,9 @@ internal object HotspotJoinCapability {
     } catch (_: Exception) { null }
 
     /** Android sends the current SoftApCapability immediately on registration, even with AP off. */
+    // The transaction code and ISoftApCallback stub are hidden framework members; this diagnostic
+    // path deliberately talks to them under shell UID and fails closed when the firmware differs.
+    @SuppressLint("BlockedPrivateApi")
     internal fun read(registration: Registration, timeoutMillis: Long = 2_000): Snapshot? {
         require(timeoutMillis in 1..2_000)
         var callback: IInterface? = null
@@ -58,7 +63,7 @@ internal object HotspotJoinCapability {
                     try {
                         data.enforceInterface(DESCRIPTOR)
                         val capability = data.readTypedObject(creator) ?: return true
-                        data.enforceNoDataAvail()
+                        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) data.enforceNoDataAvail()
                         val supported = capabilityType.getMethod("areFeaturesSupported", Long::class.javaPrimitiveType)
                             .invoke(capability, feature) == true
                         val channels = capabilityType.getMethod("getSupportedChannelList", Int::class.javaPrimitiveType)

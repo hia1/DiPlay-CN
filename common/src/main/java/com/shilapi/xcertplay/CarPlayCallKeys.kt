@@ -1,5 +1,6 @@
 package com.shilapi.xcertplay
 
+import android.annotation.SuppressLint
 import android.content.BroadcastReceiver
 import android.content.Context
 import android.content.Intent
@@ -25,7 +26,14 @@ internal object CarPlayCallKeys {
     private val handler = Handler(Looper.getMainLooper())
     @Volatile private var installed = false
 
-    /** Listens for BYD's hang-up broadcast for the life of the process; idempotent. */
+    /**
+     * Listens for BYD's hang-up broadcast for the life of the process; idempotent.
+     *
+     * The RECEIVER_EXPORTED flag overload only exists from API 33, so the lower branch cannot pass
+     * one. BYD's window manager sends the broadcast to this deliberately exported receiver, which is
+     * protected by the DUMP permission.
+     */
+    @SuppressLint("UnspecifiedRegisterReceiverFlag")
     fun install(context: Context) {
         if (installed) return
         synchronized(this) {

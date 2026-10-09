@@ -1,5 +1,6 @@
 package com.shilapi.xcertplay.network
 
+import android.annotation.SuppressLint
 import android.content.Context
 import android.net.ConnectivityManager
 import android.os.Bundle
@@ -28,6 +29,9 @@ object CarHotspotTethering {
     fun permitted(context: Context): Boolean = Settings.System.canWrite(context)
 
     /** Blocking; serialize startup and connection requests, checking cancellation after acquiring the lock. */
+    // The hidden ConnectivityManager.mService handle is the only public-API-free route to
+    // startTethering on this firmware; the call is always attempted inside the reflection guard.
+    @SuppressLint("SoonBlockedPrivateApi")
     fun enable(
         context: Context,
         isCancelled: () -> Boolean,
