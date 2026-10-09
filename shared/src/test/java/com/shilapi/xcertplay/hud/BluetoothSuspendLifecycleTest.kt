@@ -6,9 +6,12 @@ import android.bluetooth.BluetoothManager
 import android.content.ContextWrapper
 import android.content.Intent
 import android.content.ServiceConnection
+import android.content.pm.ApplicationInfo
+import android.content.pm.PackageInfo
 import com.shilapi.xcertplay.airplay.*
 import com.shilapi.xcertplay.orchestration.*
 import com.shilapi.xcertplay.transport.Iap2IdentificationConfig
+import org.junit.Before
 import org.junit.After
 import org.junit.Assert.*
 import org.junit.Test
@@ -33,11 +36,22 @@ class BluetoothSuspendLifecycleTest {
         .get(null) as ScheduledExecutorService
     private val controllers = mutableListOf<CarPlayController>()
 
+    @Before fun enableBydProfile() {
+        shadowOf(app.packageManager).installPackage(PackageInfo().apply {
+            packageName = "com.byd.carsettings"
+            applicationInfo = ApplicationInfo().apply {
+                packageName = "com.byd.carsettings"
+                flags = ApplicationInfo.FLAG_SYSTEM
+            }
+        })
+    }
+
     @After fun tearDown() {
         controllers.forEach { it.close(); assertTrue(it.awaitClosed(2_000)) }
         // Finish queued recovery before restoring the production dependency for other tests.
         worker.submit {}.get(2, TimeUnit.SECONDS)
         leaseField.set(null, original)
+        shadowOf(app.packageManager).removePackage("com.byd.carsettings")
     }
 
     @Test fun realControllerCloseCancelsDelayedDisableWithoutSessionEndedCallback() {

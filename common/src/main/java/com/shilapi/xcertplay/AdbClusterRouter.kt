@@ -55,6 +55,7 @@ internal object AdbClusterRouter {
     }
 
     fun launch(context: Context, token: String, holdStockMap: Boolean = true, prepare: (Int) -> Boolean): Result {
+        if (!enabled(context)) return Result(false, "ADB cluster route is disabled or no compatible private display is available.")
         var success = false
         val text = buildString {
             appendLine("ADB direct cluster launch capturedAt=${java.util.Date()}")

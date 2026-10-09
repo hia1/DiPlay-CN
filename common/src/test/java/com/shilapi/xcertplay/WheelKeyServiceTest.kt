@@ -2,6 +2,8 @@ package com.shilapi.xcertplay
 
 import android.content.Context
 import android.content.Intent
+import android.content.pm.ApplicationInfo
+import android.content.pm.PackageInfo
 import android.media.AudioManager
 import android.os.Looper
 import android.view.KeyEvent
@@ -35,6 +37,13 @@ class WheelKeyServiceTest {
 
     @Before fun setUp() {
         service = Robolectric.buildService(WheelKeyService::class.java).create().get()
+        shadowOf(service.packageManager).installPackage(PackageInfo().apply {
+            packageName = "com.byd.carsettings"
+            applicationInfo = ApplicationInfo().apply {
+                packageName = "com.byd.carsettings"
+                flags = ApplicationInfo.FLAG_SYSTEM
+            }
+        })
         service.getSharedPreferences("diplay_wheel_map_zoom", Context.MODE_PRIVATE).edit().clear().commit()
         service.mapRoute = { route }
         WheelZoomSettings.setEnabled(service, true)
@@ -49,6 +58,7 @@ class WheelKeyServiceTest {
         BydOutputSettings.setCarPlayCallControls(service, false)
         BydCarPlayCall.end()
         CarPlayBackgroundSession.clear()
+        shadowOf(service.packageManager).removePackage("com.byd.carsettings")
     }
 
     private val knobs = mutableListOf<com.shilapi.xcertplay.airplay.AirPlayKnobState>()

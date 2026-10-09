@@ -141,6 +141,9 @@ object BydOutputSettings {
     fun setLowChargePercent(context: Context, percent: Int) =
         prefs(context).edit().putInt(KEY_LOW_CHARGE_PERCENT, percent).apply()
 
+    /** Production execution gate for all BYD-only protocol workers and settings. */
+    fun active(context: Context): Boolean = runCatching { available(context) }.getOrDefault(false)
+
     fun standaloneHudAvailable(context: Context): Boolean = BydStandaloneHudOutput.available(context)
     fun standaloneHudDiagnosticReport(context: Context): String = BydStandaloneHudOutput.diagnostics(context)
 

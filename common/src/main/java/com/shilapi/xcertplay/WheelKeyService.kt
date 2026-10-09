@@ -130,7 +130,7 @@ class WheelKeyService : AccessibilityService() {
             return true
         }
         if (CarPlayCallKeys.onKey(this, event.keyCode, down)) return true
-        if (BydOutputSettings.carPlayCallControls(this) &&
+        if (callControlsEnabled(this) &&
             CarPlayMediaButton.opensSiriWhileCarPlay(event.keyCode) && session() != null) {
             if (!down) Log.i(TAG, "CarPlay voice key ${event.keyCode}: Siri sent=${CarPlayBackgroundSession.snapshot()?.controller?.requestSiri() == true}")
             return true
@@ -398,7 +398,11 @@ class WheelKeyService : AccessibilityService() {
          * only through it, and without it BYD's window manager opens its own phone app instead.
          */
         internal fun wanted(context: Context): Boolean = WheelZoomSettings.anyEnabled(context) ||
-            BydOutputSettings.carPlayCallControls(context)
+            callControlsEnabled(context)
+
+        internal fun callControlsEnabled(context: Context): Boolean =
+            BydOutputSettings.carPlayCallControls(context) &&
+                HeadUnitCapabilities.supports(context, HeadUnitCapabilities.Feature.OEM_CALL_CONTROLS)
 
         /**
          * Android takes the service off the allowed list when the app is force-stopped (BYD's system does

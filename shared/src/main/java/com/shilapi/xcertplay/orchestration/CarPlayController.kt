@@ -36,6 +36,7 @@ import com.shilapi.xcertplay.airplay.VideoInCar
 import com.shilapi.xcertplay.airplay.VideoPlaybackDelivery
 import com.shilapi.xcertplay.hud.BydBluetoothSuspend
 import com.shilapi.xcertplay.hud.BydNavigationOutputs
+import com.shilapi.xcertplay.hud.BydOutputSettings
 import com.shilapi.xcertplay.iap2.session.Iap2Session
 import com.shilapi.xcertplay.mfi.Iap2MfiAuthenticationClient
 import com.shilapi.xcertplay.mfi.MfiAuthenticationClient
@@ -169,8 +170,11 @@ class CarPlayController(
         require(!config.locationReportingEnabled || locationProvider != null) {
             "A location provider is required when location reporting is enabled"
         }
-        WifiScanPause.restoreIfNeeded(context.applicationContext)
-        BydNavigationOutputs.start(context.applicationContext)
+        val app = context.applicationContext
+        // Both recoveries belong to the BYD protocol. Generic head units must keep their stock
+        // Bluetooth and Wi-Fi state even if old BYD preferences are still present.
+        if (BydOutputSettings.active(app)) WifiScanPause.restoreIfNeeded(app)
+        BydNavigationOutputs.start(app)
         BydNavigationOutputs.setClusterStreamControl(::applyClusterUi)
     }
 
@@ -2184,7 +2188,7 @@ class CarPlayController(
 
     // Kept across reconnects within this controller: resuming between attempts would start a scan.
     private fun pauseWifiScans(backend: WirelessHotspotBackend) = synchronized(this) {
-        if (closed || !WifiScanPause.eligible(backend)) return@synchronized
+        if (closed || !BydOutputSettings.active(appContext) || !WifiScanPause.eligible(backend)) return@synchronized
         (wifiScanPause ?: WifiScanPause(appContext, ::debugLog).also { wifiScanPause = it }).pause()
     }
 

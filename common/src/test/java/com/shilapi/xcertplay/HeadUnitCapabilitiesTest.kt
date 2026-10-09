@@ -2,8 +2,11 @@ package com.shilapi.xcertplay
 
 import android.content.pm.ApplicationInfo
 import android.content.pm.PackageInfo
+import android.content.Context
+import android.content.ContextWrapper
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertFalse
+import org.junit.Assert.assertThrows
 import org.junit.Assert.assertTrue
 import org.junit.Test
 import org.junit.runner.RunWith
@@ -49,5 +52,24 @@ class HeadUnitCapabilitiesTest {
         assertTrue(capabilities.supports(HeadUnitCapabilities.Feature.OEM_NAVIGATION))
         assertFalse(capabilities.supports(HeadUnitCapabilities.Feature.OEM_VEHICLE_DATA))
         assertFalse(capabilities.supports(HeadUnitCapabilities.Feature.OEM_AUTOMATIC_HOTSPOT))
+    }
+
+    @Test fun detectionFailureFallsBackToGeneric() {
+        val broken = object : ContextWrapper(context) {
+            override fun getApplicationContext(): Context = this
+            override fun getPackageName(): String = error("package manager unavailable")
+        }
+        val capabilities = HeadUnitCapabilities.detect(broken)
+        assertEquals(HeadUnitCapabilities.Family.GENERIC, capabilities.family)
+        assertTrue(capabilities.features.isEmpty())
+    }
+
+    @Test fun genericSnapshotCannotAdvertiseOemFeatures() {
+        assertThrows(IllegalArgumentException::class.java) {
+            HeadUnitCapabilities.Snapshot(
+                HeadUnitCapabilities.Family.GENERIC,
+                setOf(HeadUnitCapabilities.Feature.OEM_VEHICLE_DATA),
+            )
+        }
     }
 }

@@ -275,7 +275,11 @@ internal object CarPlayMediaKeys {
     }
 
     private val callback = CarPlayMediaCallback(
-        experimentalDiLink3Keys = { appContext?.let(BydOutputSettings::carPlayCallControls) == true },
+        experimentalDiLink3Keys = {
+            val context = appContext
+            context != null && BydOutputSettings.carPlayCallControls(context) &&
+                HeadUnitCapabilities.supports(context, HeadUnitCapabilities.Feature.OEM_CALL_CONTROLS)
+        },
         send = ::send,
     )
 

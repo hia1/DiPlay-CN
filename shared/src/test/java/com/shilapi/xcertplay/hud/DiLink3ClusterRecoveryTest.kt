@@ -1,6 +1,8 @@
 package com.shilapi.xcertplay.hud
 
 import android.content.Context
+import android.content.pm.ApplicationInfo
+import android.content.pm.PackageInfo
 import java.util.concurrent.CopyOnWriteArrayList
 import java.util.concurrent.ScheduledExecutorService
 import java.util.concurrent.TimeUnit
@@ -11,6 +13,7 @@ import org.junit.Test
 import org.junit.runner.RunWith
 import org.robolectric.RobolectricTestRunner
 import org.robolectric.RuntimeEnvironment
+import org.robolectric.Shadows.shadowOf
 import org.robolectric.annotation.Config
 import org.robolectric.annotation.Implementation
 import org.robolectric.annotation.Implements
@@ -28,6 +31,14 @@ class DiLink3ClusterRecoveryTest {
 
     @Before fun setup() {
         drain()
+        // The navigation-output facade is now the production OEM boundary, so BYD tests opt in.
+        shadowOf(app.packageManager).installPackage(PackageInfo().apply {
+            packageName = "com.byd.carsettings"
+            applicationInfo = ApplicationInfo().apply {
+                packageName = "com.byd.carsettings"
+                flags = ApplicationInfo.FLAG_SYSTEM
+            }
+        })
         app.getSharedPreferences("xcertplay_airplay", 0).edit().clear().commit()
         Shell.commands.clear()
         Shell.response = { "Result: Parcel(00000000 00000000 '........')" }
@@ -41,6 +52,7 @@ class DiLink3ClusterRecoveryTest {
         ReflectionHelpers.setField(output, "session", null)
         ReflectionHelpers.setField(output, "desiredMode", null)
         ReflectionHelpers.setField(output, "context", null)
+        shadowOf(app.packageManager).removePackage("com.byd.carsettings")
     }
 
     @Test fun appOpeningRecoversAnInterruptedClusterEvenWhenNavigationIsDisabled() {

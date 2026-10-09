@@ -166,9 +166,12 @@ class CarPlayHostActivity : ComponentActivity() {
             hardwareVersion = "1.0",
             carPlayUsbInterfaceNumber = 3,
             locationInformationEnabled = locationReportingEnabled,
-            vehicleStatusEnabled = com.shilapi.xcertplay.hud.BydOutputSettings.batteryToIphoneActive(this),
+            vehicleStatusEnabled = HeadUnitCapabilities.supports(this, HeadUnitCapabilities.Feature.OEM_VEHICLE_DATA) &&
+                com.shilapi.xcertplay.hud.BydOutputSettings.batteryToIphoneActive(this),
             chargingConnectors = com.shilapi.xcertplay.hud.BydOutputSettings.chargingConnectors(this),
-            vehicleSpeedEnabled = locationReportingEnabled && com.shilapi.xcertplay.hud.BydOutputSettings.wheelSpeedToIphoneActive(this),
+            vehicleSpeedEnabled = locationReportingEnabled &&
+                HeadUnitCapabilities.supports(this, HeadUnitCapabilities.Feature.OEM_VEHICLE_DATA) &&
+                com.shilapi.xcertplay.hud.BydOutputSettings.wheelSpeedToIphoneActive(this),
         ),
         label = "DiPlay",
         hostName = "diplay-" + DiPlayBootstrap.deviceId(airPlayIdentity).replace(":", "").lowercase(),
@@ -1699,7 +1702,8 @@ class CarPlayHostActivity : ComponentActivity() {
 
     // The battery shows only where DiPlay already reads it for the iPhone.
     private fun refreshSidePanel() {
-        val battery = if (com.shilapi.xcertplay.hud.BydOutputSettings.batteryToIphoneActive(this)) {
+        val battery = if (HeadUnitCapabilities.supports(this, HeadUnitCapabilities.Feature.OEM_VEHICLE_DATA) &&
+            com.shilapi.xcertplay.hud.BydOutputSettings.batteryToIphoneActive(this)) {
             com.shilapi.xcertplay.hud.BydNavigationOutputs.batteryStatus(applicationContext).snapshot()
         } else null
         sidePanelBattery?.text = battery?.let { "🔋 ${Math.round(it.batteryPercent)} %  ·  ${it.rangeKm} km" }.orEmpty()
@@ -3881,7 +3885,8 @@ class CarPlayHostActivity : ComponentActivity() {
             model = normalizedModel(),
             oemLabel = oemLabel,
             icons = listOf(loadAirPlayIcon()),
-            videoInCar = com.shilapi.xcertplay.hud.BydOutputSettings.videoWhileParkedActive(this),
+            videoInCar = HeadUnitCapabilities.supports(this, HeadUnitCapabilities.Feature.OEM_VEHICLE_DATA) &&
+                com.shilapi.xcertplay.hud.BydOutputSettings.videoWhileParkedActive(this),
             mainBufferedAudio = AirPlayPersistence.loadMainBufferedAudio(this),
             disableAudioOutput = carBluetoothAudio,
         )
@@ -4395,7 +4400,8 @@ class CarPlayHostActivity : ComponentActivity() {
             savePairRecord = { record -> AirPlayPersistence.saveLockdownRecord(this, record) },
             clearPairRecord = { AirPlayPersistence.clearLockdownRecord(this) },
             locationProvider = locationProvider,
-            vehicleStatusProvider = if (com.shilapi.xcertplay.hud.BydOutputSettings.batteryToIphoneActive(this)) {
+            vehicleStatusProvider = if (HeadUnitCapabilities.supports(this, HeadUnitCapabilities.Feature.OEM_VEHICLE_DATA) &&
+                com.shilapi.xcertplay.hud.BydOutputSettings.batteryToIphoneActive(this)) {
                 com.shilapi.xcertplay.hud.BydNavigationOutputs.batteryStatus(applicationContext)
             } else {
                 null

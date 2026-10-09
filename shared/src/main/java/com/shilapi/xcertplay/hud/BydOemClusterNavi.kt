@@ -27,6 +27,8 @@ object BydOemClusterNavi {
         return runCatching {
             worker.submit<Boolean> {
                 val mode = BydOutputSettings.oemClusterHold(app)
+                // OFF never writes OEM state, so the generic private-display route may continue.
+                if (mode != BydOemClusterHold.OFF && !BydOutputSettings.active(app)) return@submit false
                 (mode == BydOemClusterHold.OFF || applicable(app)) &&
                     state(app).acquire(mode, lease, current)
             }.get()
@@ -36,6 +38,7 @@ object BydOemClusterNavi {
     /** Always enqueue, even when acquire has not saved its journal yet. */
     fun release(context: Context, lease: String? = null) {
         val app = context.applicationContext
+        if (!BydOutputSettings.active(app)) return
         worker.execute {
             val pendingLease = lease ?: runCatching { journal(app)?.lease }.getOrNull()
             val restored = runCatching { state(app).release(pendingLease) }
