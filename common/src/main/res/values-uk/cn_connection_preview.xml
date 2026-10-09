@@ -1,6 +1,6 @@
 <resources>
     <string name="connect_when_iphone_bluetooth_connects">Підключати після повторного з’єднання вибраного iPhone</string>
-    <string name="connect_when_iphone_bluetooth_connects_description">Після пробудження авто відкривати DiPlay і запускати бездротовий CarPlay, коли вибраний iPhone підключиться через Bluetooth. Деякі пристрої обмежують фоновий запуск.</string>
+    <string name="connect_when_iphone_bluetooth_connects_description">Після пробудження авто відкривати Lodestar і запускати бездротовий CarPlay, коли вибраний iPhone підключиться через Bluetooth. Деякі пристрої обмежують фоновий запуск.</string>
     <string name="connection_stage_diagnostic_hint">Якщо очікування затягнулося, поверніться на головну та збережіть звіт діагностики.</string>
     <string name="connection_stage_bluetooth_hint">Переконайтеся, що вибраний iPhone поруч, розблокований і підключений до Bluetooth авто.</string>
     <string name="connection_stage_wifi_hint">Не вимикайте Wi-Fi в авто та на iPhone під час підключення.</string>

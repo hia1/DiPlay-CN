@@ -1,6 +1,6 @@
 <resources>
     <string name="connect_when_iphone_bluetooth_connects">الاتصال عند عودة اتصال iPhone المحدد</string>
-    <string name="connect_when_iphone_bluetooth_connects_description">بعد تنشيط السيارة، افتح DiPlay وشغّل CarPlay اللاسلكي عند اتصال iPhone المحدد عبر Bluetooth. قد تمنع بعض الأجهزة التشغيل في الخلفية.</string>
+    <string name="connect_when_iphone_bluetooth_connects_description">بعد تنشيط السيارة، افتح Lodestar وشغّل CarPlay اللاسلكي عند اتصال iPhone المحدد عبر Bluetooth. قد تمنع بعض الأجهزة التشغيل في الخلفية.</string>
     <string name="connection_stage_diagnostic_hint">إذا طال الانتظار، ارجع إلى الصفحة الرئيسية واحفظ تقرير التشخيص.</string>
     <string name="connection_stage_bluetooth_hint">تأكد من قرب iPhone المحدد وفتح قفله واتصاله ببلوتوث السيارة.</string>
     <string name="connection_stage_wifi_hint">أبقِ Wi-Fi قيد التشغيل في السيارة وiPhone أثناء إنشاء الاتصال.</string>

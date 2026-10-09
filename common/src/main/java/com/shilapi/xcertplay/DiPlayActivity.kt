@@ -3163,7 +3163,7 @@ class DiPlayActivity : ComponentActivity(), AppAppearanceOwner {
         })
         body.addView(button(getString(R.string.copy_command), false) {
             getSystemService(android.content.ClipboardManager::class.java).setPrimaryClip(
-                android.content.ClipData.newPlainText("DiPlay ADB Command", adbCmd)
+                android.content.ClipData.newPlainText("Lodestar ADB Command", adbCmd)
             )
             toast(getString(R.string.copied_to_the_car_clipboard_run_the_command_on_your_comput))
         }, matchButton(8, 50))
@@ -4716,7 +4716,7 @@ class DiPlayActivity : ComponentActivity(), AppAppearanceOwner {
         }, "adb-cluster-authorize").start()
     }
 
-    private fun reportFileName() = "DiPlay-${SimpleDateFormat("yyyyMMdd-HHmmss-SSS", Locale.US).format(Date())}.txt"
+    private fun reportFileName() = "Lodestar-${SimpleDateFormat("yyyyMMdd-HHmmss-SSS", Locale.US).format(Date())}.txt"
 
     private fun chooseReportDestination() {
         // Some head units omit or disable DocumentsUI. Launch itself can throw, before
@@ -4734,7 +4734,7 @@ class DiPlayActivity : ComponentActivity(), AppAppearanceOwner {
         Thread({
             val result = runCatching {
                 val report = buildString {
-                    appendLine("DiPlay ${version()} · private beta diagnostic report")
+                    appendLine("Lodestar ${version()} · private beta diagnostic report")
                     appendLine("Android ${Build.VERSION.RELEASE} / API ${Build.VERSION.SDK_INT}")
                     appendLine("Head unit: ${Build.MANUFACTURER} ${Build.MODEL}")
                     appendLine("Connection: ${if (AirPlayPersistence.loadWirelessEnabled(appContext)) "wireless" else "USB"}")
@@ -4822,7 +4822,7 @@ class DiPlayActivity : ComponentActivity(), AppAppearanceOwner {
                         .setMessage(when {
                             savedReport.savedInApp -> getString(R.string.diagnostic_report_saved_in_app)
                             savedReport.savedPath != null -> getString(R.string.diagnostic_report_saved_to_path, savedReport.savedPath)
-                            uri == null -> "Downloads/DiPlay/$fileName"
+                uri == null -> "Downloads/Lodestar/$fileName"
                             else -> getString(R.string.your_report_was_saved_to_the_selected_location)
                         })
                         .setPositiveButton(getString(R.string.view_diagnostic_report)) { _, _ -> showDiagnosticReport(report) }
