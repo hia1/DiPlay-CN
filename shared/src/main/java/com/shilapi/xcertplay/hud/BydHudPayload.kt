@@ -15,7 +15,6 @@ internal object BydHudPayload {
         eta: String = "",
     ): ByteArray =
         ByteArrayOutputStream(64 + (icon?.size ?: 0)).apply {
-            // HUD experiment A: match the fixed guidance value observed by BYDMate.
             field(2, 2)
             field(6, 1)
             bytes(7, ByteArray(0))

@@ -1247,8 +1247,8 @@ class DiPlayActivity : ComponentActivity(), AppAppearanceOwner {
     private fun navigationSettings(content: LinearLayout) {
         settingsPageTitle(content, getString(R.string.settings_navigation), getString(R.string.settings_navigation_summary))
         renderSections(content, SettingsInformationArchitecture.sectionsByCategory.getValue(SettingsCategory.NAVIGATION))
-        // The BYD card is hidden without its receiver; say so instead of leaving a gap.
-        if (!BydOutputSettings.available(this)) {
+        val capabilities = HeadUnitCapabilities.detect(this)
+        if (!capabilities.isGeneric && !capabilities.supports(HeadUnitCapabilities.Feature.OEM_NAVIGATION)) {
             content.addView(label(getString(R.string.settings_byd_navigation_unavailable), 15, MUTED).apply {
                 setPadding(dp(4), 0, dp(4), dp(SETTINGS_BLOCK_GAP_DP))
             })
@@ -2034,7 +2034,7 @@ class DiPlayActivity : ComponentActivity(), AppAppearanceOwner {
                 }
             }
         }
-        if (BydOutputSettings.available(this)) filteredSection(content, SettingsSection.BYD_NAVIGATION,
+        if (HeadUnitCapabilities.detect(this).supports(HeadUnitCapabilities.Feature.OEM_NAVIGATION)) filteredSection(content, SettingsSection.BYD_NAVIGATION,
             getString(R.string.byd_navigation), R.drawable.ic_dp_navigation) { card ->
             toggle(card, getString(R.string.navigation_on_hud_and_instrument_cluster),
                 getString(R.string.show_phone_navigation_arrows_distance_and_street_names_on),
@@ -2213,7 +2213,7 @@ class DiPlayActivity : ComponentActivity(), AppAppearanceOwner {
 
     private fun bydAdbSettings(parent: LinearLayout) {
         if (AirPlayPersistence.loadWirelessHotspotMode(this) != WirelessHotspotMode.MANUAL) return
-        if (!CarHotspotSetup.isBydHeadUnit(this)) {
+        if (!HeadUnitCapabilities.detect(this).supports(HeadUnitCapabilities.Feature.OEM_AUTOMATIC_HOTSPOT)) {
             Log.i("DiPlay-Hotspot", "settings hidden: BYD head unit not detected")
             return
         }
@@ -2491,6 +2491,14 @@ class DiPlayActivity : ComponentActivity(), AppAppearanceOwner {
     }
 
     private fun setupCarStep(content: LinearLayout) {
+        val capabilities = HeadUnitCapabilities.detect(this)
+        if (capabilities.isGeneric) {
+            setupTitle(content, R.string.setup_car_title, getString(R.string.setup_car_generic_detected))
+            val card = card()
+            card.addView(label(getString(R.string.head_unit_profile_generic), 22, TEXT, true))
+            content.addView(card, LinearLayout.LayoutParams(-1, -2).apply { bottomMargin = dp(18) })
+            return
+        }
         val detection = DiLinkGeneration.detect()
         val selected = DiLinkGeneration.confirmed(this) ?: detection.generation
         setupTitle(content, R.string.setup_car_title, when (detection.source) {
@@ -2541,10 +2549,16 @@ class DiPlayActivity : ComponentActivity(), AppAppearanceOwner {
     }
 
     private fun setupFeaturesStep(content: LinearLayout) {
+        val capabilities = HeadUnitCapabilities.detect(this)
         val generation = DiLinkGeneration.current(this)
-        setupTitle(content, R.string.setup_features_title, getString(R.string.setup_features_description,
-            dilinkLabel(generation)))
-        if (SetupGuide.hasConflictingClusterRoute(generation, AirPlayPersistence.loadAdbClusterEnabled(this))) {
+        if (capabilities.isGeneric) {
+            setupTitle(content, R.string.setup_features_title, getString(R.string.setup_features_description_generic))
+        } else {
+            setupTitle(content, R.string.setup_features_title, getString(R.string.setup_features_description,
+                dilinkLabel(generation)))
+        }
+        if (!capabilities.isGeneric &&
+            SetupGuide.hasConflictingClusterRoute(generation, AirPlayPersistence.loadAdbClusterEnabled(this))) {
             val warning = card()
             warning.addView(label(getString(R.string.setup_cluster_route_conflict), 16, WARNING))
             warning.addView(button(getString(R.string.setup_cluster_route_turn_off), true) {
@@ -2556,7 +2570,7 @@ class DiPlayActivity : ComponentActivity(), AppAppearanceOwner {
             content.addView(warning, LinearLayout.LayoutParams(-1, -2).apply { bottomMargin = dp(18) })
         }
         val card = card()
-        SetupGuide.features(generation).forEach { entry ->
+        SetupGuide.features(capabilities.family, generation).forEach { entry ->
             val before = card.childCount
             when (entry.feature) {
                 SetupGuide.Feature.AUTO_CONNECT -> toggle(card, getString(R.string.connect_when_diplay_opens),
@@ -3127,8 +3141,7 @@ class DiPlayActivity : ComponentActivity(), AppAppearanceOwner {
     /** Steering-wheel keys for the dashboard map zoom and the CarPlay joystick: the switches, the key service and the keys. */
     // One place for the key service setup, above every feature that needs it.
     private fun wheelKeysSettings(card: LinearLayout) {
-        // The joystick and map zoom use BYD's media and custom keys.
-        val byd = CarHotspotSetup.isBydHeadUnit(this)
+        val byd = HeadUnitCapabilities.detect(this).supports(HeadUnitCapabilities.Feature.OEM_STEERING_WHEEL_KEYS)
         val zoomAvailable = wheelMapZoomAvailable()
         val vehicleKeysOn = WheelZoomSettings.joystick(this) ||
             (zoomAvailable && WheelZoomSettings.enabled(this))

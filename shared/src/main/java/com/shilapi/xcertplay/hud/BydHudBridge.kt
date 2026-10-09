@@ -25,8 +25,6 @@ internal object BydHudBridge {
     private const val TX_REGISTER_CALLBACK = 1
     private const val TX_START_SERVICE = 4
     private const val TX_FIRE_EVENT = 6
-    private const val ICON_ASSET_DIR = "byd-hud-icons"
-
     private val callbacks = Executors.newSingleThreadExecutor { task ->
         Thread(task, "diplay-hud-callback").apply { isDaemon = true }
     }
@@ -40,8 +38,6 @@ internal object BydHudBridge {
     private var guidanceSentLogged = false
     private var showing = false
     private var lastSendResult: Int? = null
-    private var icons: Map<Int, ByteArray>? = null
-
     // The gateway pings registered callbacks and drops registrations that do not answer like an AIDL stub.
     private val callback = object : Binder() {
         override fun onTransact(code: Int, data: Parcel, reply: Parcel?, flags: Int): Boolean = when (code) {
@@ -124,7 +120,7 @@ internal object BydHudBridge {
         val payload = BydHudPayload.guidance(
             distanceMeters = guidance.distanceMeters,
             maneuver = guidance.maneuver,
-            icon = iconFor(guidance.gaode),
+            icon = null,
             road = guidance.road,
         )
         val accepted = sendLocked(payload)
@@ -140,23 +136,6 @@ internal object BydHudBridge {
         if (!sendLocked(BydHudPayload.clear())) return
         showing = false
         guidanceSentLogged = false
-    }
-
-    // Arrow-less maneuvers (roundabouts, destination) are only visible through the field-8 icon.
-    private fun iconFor(gaode: Int): ByteArray? {
-        if (gaode <= 0) return null
-        val loaded = icons ?: loadIcons().also { icons = it }
-        return loaded[gaode]
-    }
-
-    private fun loadIcons(): Map<Int, ByteArray> {
-        val assets = context?.assets ?: return emptyMap()
-        return runCatching {
-            assets.list(ICON_ASSET_DIR).orEmpty().mapNotNull { name ->
-                val code = name.removePrefix("0x").removeSuffix(".png").toIntOrNull(16) ?: return@mapNotNull null
-                code to assets.open("$ICON_ASSET_DIR/$name").use { it.readBytes() }
-            }.toMap()
-        }.onFailure { Log.w(TAG, "HUD icons unavailable", it) }.getOrDefault(emptyMap())
     }
 
     private fun bindLocked() {

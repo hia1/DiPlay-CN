@@ -126,7 +126,7 @@
     <string name="back_to_diplay">Volver a DiPlay</string>
     <string name="band">Banda</string>
     <string name="bluetooth_settings">Ajustes de Bluetooth</string>
-    <string name="byd_navigation">Navegación BYD</string>
+    <string name="byd_navigation">Guía del vehículo en el panel y el HUD</string>
     <string name="cancel">Cancelar</string>
     <string name="car_home">Inicio del coche</string>
     <string name="car_hotspot_details">Datos del punto de acceso del coche</string>
@@ -344,7 +344,7 @@
     <string name="share">Compartir</string>
     <string name="show_on_screen_debug_logs">Mostrar registros de depuración en pantalla</string>
     <string name="show_password">Mostrar contraseña</string>
-    <string name="show_phone_navigation_arrows_distance_and_street_names_on">Muestra las flechas de navegación, la distancia y los nombres de calles del teléfono en pantallas BYD compatibles. La compatibilidad varía según el vehículo.</string>
+    <string name="show_phone_navigation_arrows_distance_and_street_names_on">Muestra las flechas de navegación, la distancia y los nombres de calles del teléfono en pantallas del vehículo compatibles. La compatibilidad varía según el vehículo.</string>
     <string name="show_the_side_map_only_when_its_card_is_open_and_switch_to">Muestra el mapa lateral solo cuando su tarjeta está abierta y cambia al mapa completo en el tema del mapa. Los cambios de tema y tarjeta mantienen CarPlay conectado.</string>
     <string name="shows_the_iphone_s_cluster_map_on_the_instrument_cluster_c">Muestra el mapa del iPhone en el panel de instrumentos. Selecciona navegación en pantalla pequeña o completa en el menú del panel mediante los controles del volante.</string>
     <string name="start_carplay_automatically_after_device_boot">Iniciar CarPlay automáticamente tras el arranque del dispositivo</string>
@@ -547,7 +547,7 @@
     <string name="hotspot_control_unsupported">El firmware no admite el inicio automático del punto de acceso. Actívalo en los ajustes del coche.</string>
     <string name="hotspot_control_timeout">Se agotó el tiempo de espera del punto de acceso. Actívalo en los ajustes del coche.</string>
     <string name="hotspot_control_failed">No se pudo iniciar el punto de acceso. Actívalo en los ajustes del coche.</string>
-    <string name="byd_adb_features">Funciones BYD · requieren ADB</string>
+    <string name="byd_adb_features">Funciones del vehículo · requieren ADB</string>
     <string name="location_reporting_reconnects">Cambiar este ajuste vuelve a conectar la sesión activa de CarPlay.</string>
     <string name="diagnostic_report_saved_in_app">El informe se guardó de forma privada en DiPlay porque no había una ubicación pública disponible. Compártelo o míralo aquí. No se envía nada automáticamente.</string>
     <string name="diagnostic_report_saved_to_path">El informe se guardó en:\n%1$s\n\nTambién puedes compartirlo o verlo aquí. No se envía nada automáticamente.</string>
@@ -720,6 +720,9 @@
     <string name="setup_iphone_none">Aún no hay iPhone elegido</string>
     <string name="setup_features_title">Funciones</string>
     <string name="setup_features_description">Sugerido para %1$s. Activa lo que quieras ahora; todo queda en Ajustes y puede cambiarse luego.</string>
+    <string name="setup_features_description_generic">Sugerencias para una unidad principal Android genérica. Activa lo que quieras ahora; todo queda en Ajustes y puede cambiarse luego.</string>
+    <string name="setup_car_generic_detected">DiPlay detectó una unidad principal Android genérica.</string>
+    <string name="head_unit_profile_generic">Unidad principal Android genérica</string>
     <string name="setup_cluster_route_conflict">La ruta del clúster de DiLink 4 está activada. En DiLink 3 impide el mapa de CarPlay en el cuadro de instrumentos.</string>
     <string name="setup_cluster_route_turn_off">Desactívala</string>
     <string name="setup_badge_tested">Probado en algunos coches</string>

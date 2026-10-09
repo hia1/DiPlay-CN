@@ -131,7 +131,7 @@
     <string name="back_to_diplay">Back to DiPlay</string>
     <string name="band">Band</string>
     <string name="bluetooth_settings">Bluetooth settings</string>
-    <string name="byd_navigation">BYD navigation</string>
+    <string name="byd_navigation">Vehicle dashboard and HUD guidance</string>
     <string name="cancel">Cancel</string>
     <string name="car_home">Car home</string>
     <string name="car_hotspot_details">Car hotspot details</string>
@@ -382,7 +382,7 @@
     <string name="settings_vehicle_summary">Driving side, wheel keys, car button and CarPlay gestures</string>
     <string name="settings_reconnect_pending">Saved. Some changes apply when CarPlay reconnects.</string>
     <string name="settings_reconnect_now">Reconnect now</string>
-    <string name="settings_byd_navigation_unavailable">BYD dashboard and HUD guidance is not available on this head unit.</string>
+    <string name="settings_byd_navigation_unavailable">Vehicle dashboard and HUD guidance is not available on this head unit.</string>
     <string name="settings_advanced_media">Video and audio</string>
     <string name="settings_wheel_keys">Wheel keys</string>
     <string name="settings_experimental_display">Display (experimental)</string>
@@ -394,7 +394,7 @@
     <string name="share">Share</string>
     <string name="show_on_screen_debug_logs">Show on-screen debug logs</string>
     <string name="show_password">Show password</string>
-    <string name="show_phone_navigation_arrows_distance_and_street_names_on">Show phone navigation arrows, distance and street names on supported BYD displays. Vehicle compatibility varies.</string>
+    <string name="show_phone_navigation_arrows_distance_and_street_names_on">Show phone navigation arrows, distance and street names on supported vehicle displays. Vehicle compatibility varies.</string>
     <string name="show_the_side_map_only_when_its_card_is_open_and_switch_to">Show the side map only when its card is open, and switch to the full map in Map theme. Theme and card changes keep CarPlay connected.</string>
     <string name="shows_the_iphone_s_cluster_map_on_the_instrument_cluster_c">Shows the iPhone\'s map on the dashboard. Choose Small or Full screen navi in the dashboard\'s steering-wheel menu.</string>
     <string name="start_carplay_automatically_after_device_boot">Start CarPlay automatically after device boot</string>
@@ -628,7 +628,7 @@
     <string name="hotspot_control_unsupported">This firmware does not support automatic hotspot startup. Open the hotspot in car settings.</string>
     <string name="hotspot_control_timeout">Timed out waiting for the car hotspot. Open the hotspot in car settings.</string>
     <string name="hotspot_control_failed">The car could not start its hotspot. Open the hotspot in car settings.</string>
-    <string name="byd_adb_features">BYD features · needs ADB</string>
+    <string name="byd_adb_features">Vehicle features · needs ADB</string>
     <string name="location_reporting_reconnects">Changing this setting reconnects an active CarPlay session.</string>
     <string name="diagnostic_report_saved_in_app">Your report was saved privately in DiPlay because a public save location was unavailable. Share it or view it here. Nothing is sent automatically.</string>
     <string name="diagnostic_report_saved_to_path">Your report was saved to:\n%1$s\n\nYou can also share it or view it here. Nothing is sent automatically.</string>
@@ -817,6 +817,9 @@
     <string name="setup_iphone_none">No iPhone chosen yet</string>
     <string name="setup_features_title">Features</string>
     <string name="setup_features_description">Suggested for %1$s. Turn on what you want now; everything stays in Settings and can be changed later.</string>
+    <string name="setup_features_description_generic">Suggestions for a generic Android head unit. Turn on what you want now; everything stays in Settings and can be changed later.</string>
+    <string name="setup_car_generic_detected">DiPlay detected a generic Android head unit.</string>
+    <string name="head_unit_profile_generic">Generic Android head unit</string>
     <string name="setup_cluster_route_conflict">The DiLink 4 cluster route is on. On DiLink 3 it stops the CarPlay map on the dashboard.</string>
     <string name="setup_cluster_route_turn_off">Turn it off</string>
     <string name="setup_badge_tested">Tested on some cars</string>

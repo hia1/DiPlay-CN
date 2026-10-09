@@ -129,7 +129,7 @@
     <string name="back_to_diplay">Повернутися до DiPlay</string>
     <string name="band">Діапазон</string>
     <string name="bluetooth_settings">Налаштування Bluetooth</string>
-    <string name="byd_navigation">Навігація BYD</string>
+    <string name="byd_navigation">Підказки маршруту на панелі та HUD</string>
     <string name="cancel">Скасувати</string>
     <string name="car_home">Головний екран автомобіля</string>
     <string name="car_hotspot_details">Дані точки доступу автомобіля</string>
@@ -355,7 +355,7 @@
     <string name="share">Поділитися</string>
     <string name="show_on_screen_debug_logs">Показувати журнали налагодження на екрані</string>
     <string name="show_password">Показати пароль</string>
-    <string name="show_phone_navigation_arrows_distance_and_street_names_on">Показувати стрілки навігації, відстань і назви вулиць із телефона на підтримуваних екранах BYD. Сумісність залежить від автомобіля.</string>
+    <string name="show_phone_navigation_arrows_distance_and_street_names_on">Показувати стрілки навігації, відстань і назви вулиць із телефона на підтримуваних екранах автомобіля. Сумісність залежить від автомобіля.</string>
     <string name="show_the_side_map_only_when_its_card_is_open_and_switch_to">Показувати карту збоку, лише коли відкрито її картку, та переходити до повної карти в темі «Карта». Зміна теми чи картки не перериває CarPlay.</string>
     <string name="shows_the_iphone_s_cluster_map_on_the_instrument_cluster_c">Показує карту iPhone на приборці. У меню приборки на кермі виберіть «Мала навігація» або «Повноекранна навігація».</string>
     <string name="start_carplay_automatically_after_device_boot">Автоматично запускати CarPlay після завантаження пристрою</string>
@@ -560,7 +560,7 @@
     <string name="hotspot_control_unsupported">Прошивка не підтримує автоматичне ввімкнення точки доступу. Відкрийте налаштування авто.</string>
     <string name="hotspot_control_timeout">Час очікування ввімкнення точки доступу минув. Відкрийте налаштування авто.</string>
     <string name="hotspot_control_failed">Не вдалося ввімкнути точку доступу. Відкрийте налаштування авто.</string>
-    <string name="byd_adb_features">Функції BYD · потрібен ADB</string>
+    <string name="byd_adb_features">Функції автомобіля · потрібен ADB</string>
     <string name="diagnostic_report_saved_in_app">Звіт збережено приватно в DiPlay, оскільки загальнодоступне місце збереження недоступне. Поділіться ним або перегляньте його тут. Нічого не надсилається автоматично.</string>
     <string name="diagnostic_report_saved_to_path">Звіт збережено в:\n%1$s\n\nВи також можете поділитися ним або переглянути його тут. Нічого не надсилається автоматично.</string>
     <string name="view_diagnostic_report">Переглянути звіт</string>
@@ -732,6 +732,9 @@
     <string name="setup_iphone_none">iPhone ще не обрано</string>
     <string name="setup_features_title">Функції</string>
     <string name="setup_features_description">Запропоновано для %1$s. Увімкніть потрібне зараз; усе лишається в налаштуваннях і можна змінити пізніше.</string>
+    <string name="setup_features_description_generic">Пропозиції для типового головного пристрою Android. Увімкніть потрібне зараз; усе лишається в налаштуваннях і можна змінити пізніше.</string>
+    <string name="setup_car_generic_detected">DiPlay визначила типовий головний пристрій Android.</string>
+    <string name="head_unit_profile_generic">Типовий головний пристрій Android</string>
     <string name="setup_cluster_route_conflict">Маршрут на приладку DiLink 4 увімкнено. На DiLink 3 він блокує карту CarPlay на приладовій панелі.</string>
     <string name="setup_cluster_route_turn_off">Вимкнути</string>
     <string name="setup_badge_tested">Перевірено на деяких авто</string>

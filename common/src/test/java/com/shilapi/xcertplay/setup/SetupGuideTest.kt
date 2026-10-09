@@ -1,6 +1,7 @@
 package com.shilapi.xcertplay.setup
 
 import com.shilapi.xcertplay.setup.DiLinkGeneration.Source
+import com.shilapi.xcertplay.HeadUnitCapabilities
 import com.shilapi.xcertplay.setup.SetupGuide.Feature
 import com.shilapi.xcertplay.setup.SetupGuide.Status
 import org.junit.Assert.assertEquals
@@ -36,6 +37,13 @@ class SetupGuideTest {
         assertEquals(DiLinkGeneration.UNKNOWN, detection.generation)
         assertEquals(Source.NONE, detection.source)
         assertNull(DiLinkGeneration.detect(null, null, null, 28).evidence)
+    }
+
+    @Test fun genericHeadUnitGuideOffersOnlySafeCommonFeatures() {
+        val features = SetupGuide.features(HeadUnitCapabilities.Family.GENERIC, DiLinkGeneration.UNKNOWN)
+        assertEquals(listOf(Feature.AUTO_CONNECT, Feature.LOCATION), features.map { it.feature })
+        assertTrue(features.all { it.status == Status.TESTED })
+        assertTrue(features.none { it.needsAdb })
     }
 
     @Test fun diLink4ClusterRouteIsOnlyOfferedOnDiLink4() {

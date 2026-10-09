@@ -124,7 +124,7 @@
     <string name="back_to_diplay">返回 DiPlay</string>
     <string name="band">频段</string>
     <string name="bluetooth_settings">蓝牙设置</string>
-    <string name="byd_navigation">比亚迪导航</string>
+    <string name="byd_navigation">车辆仪表盘和 HUD 导航</string>
     <string name="cancel">取消</string>
     <string name="car_home">车机主页</string>
     <string name="car_hotspot_details">车机热点详情</string>
@@ -356,7 +356,7 @@
     <string name="share">分享</string>
     <string name="show_on_screen_debug_logs">在屏幕上显示调试日志</string>
     <string name="show_password">显示密码</string>
-    <string name="show_phone_navigation_arrows_distance_and_street_names_on">在支持的比亚迪显示屏上显示手机导航箭头、距离和道路名称。不同车型的兼容性有所差异。</string>
+    <string name="show_phone_navigation_arrows_distance_and_street_names_on">在支持的车辆显示屏上显示手机导航箭头、距离和道路名称。不同车型的兼容性有所差异。</string>
     <string name="show_the_side_map_only_when_its_card_is_open_and_switch_to">仅在地图卡片展开时显示侧方地图，并在“地图主题”中切换为完整地图。更改主题或卡片不会中断 CarPlay 连接。</string>
     <string name="shows_the_iphone_s_cluster_map_on_the_instrument_cluster_c">在仪表盘上显示iPhone地图。通过方向盘操作仪表盘菜单，选择小屏导航或全屏导航。</string>
     <string name="start_carplay_automatically_after_device_boot">设备启动后自动启动 CarPlay</string>
@@ -591,7 +591,7 @@
     <string name="hotspot_control_unsupported">当前固件不支持自动开启热点，请在车机设置中开启。</string>
     <string name="hotspot_control_timeout">等待车机热点开启超时，请在车机设置中开启。</string>
     <string name="hotspot_control_failed">车机热点开启失败，请在车机设置中开启。</string>
-    <string name="byd_adb_features">比亚迪功能 · 需要 ADB</string>
+    <string name="byd_adb_features">车辆功能 · 需要 ADB</string>
     <string name="location_reporting_reconnects">更改此设置会重新连接当前 CarPlay 会话。</string>
     <string name="diagnostic_report_saved_in_app">由于公共保存位置不可用，报告已私密保存到 DiPlay。您可以在此分享或查看报告。不会自动发送任何内容。</string>
     <string name="diagnostic_report_saved_to_path">报告已保存到：\n%1$s\n\n您也可以在此分享或查看报告。不会自动发送任何内容。</string>
@@ -780,6 +780,9 @@
     <string name="setup_iphone_none">尚未选择 iPhone</string>
     <string name="setup_features_title">功能</string>
     <string name="setup_features_description">已按 %1$s 给出建议。现在开启想要的即可，之后都能在设置中更改。</string>
+    <string name="setup_features_description_generic">已按通用 Android 车机给出建议。现在开启想要的即可，之后都能在设置中更改。</string>
+    <string name="setup_car_generic_detected">DiPlay 检测到通用 Android 车机。</string>
+    <string name="head_unit_profile_generic">通用 Android 车机</string>
     <string name="setup_cluster_route_conflict">DiLink 4 的仪表导航路线已开启。在 DiLink 3 上它会阻止仪表盘显示 CarPlay 地图。</string>
     <string name="setup_cluster_route_turn_off">关闭它</string>
     <string name="setup_badge_tested">部分车辆已实测</string>
