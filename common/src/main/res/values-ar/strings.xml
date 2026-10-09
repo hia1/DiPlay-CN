@@ -623,12 +623,6 @@
     <string name="call_voice_filter_description">يخفض الجهير في صوت مكالمات CarPlay. قد يغيّر صوت المتحدثين. يُطبَّق عند الاتصال التالي بـ CarPlay.</string>
     <string name="smooth_video">فيديو سلس (تجريبي)</string>
     <string name="smooth_video_description">يعرض كل إطار من الشاشة الرئيسية لـ CarPlay في الوقت الذي وسمه به iPhone مع تأخير قصير، بدلًا من عرضه فور فك ترميزه. يضبط التأخير نفسه تلقائيًا حتى يُفك ترميز معظم الإطارات في الوقت المناسب، وتُعرض الإطارات غير الجاهزة في وقتها رغم ذلك فورًا. قد يبدو التمرير أكثر انتظامًا، لكن الاستجابة للمس تتأخر. لا تنطبق إعدادات الصورة. يعيد توصيل CarPlay.</string>
-    <string name="settings_direct_video_output">إخراج فيديو مباشر (تجريبي)</string>
-    <string name="settings_direct_video_output_description">يرسل صورة CarPlay مباشرة إلى مركّب شاشة السيارة بدلًا من رسمها داخل نافذة DiPlay. قد يخفض التأخير بمقدار تحديث شاشة واحد. تعديلات الصورة لا تُطبَّق. يعيد اتصال CarPlay.</string>
-    <string name="settings_low_latency_decoder">فك ترميز منخفض الكمون (تجريبي)</string>
-    <string name="settings_low_latency_decoder_description">يطلب من مرمّزات Qualcomm إخراج كل إطار فور فك ترميزه ومن خيط مخصص دون انتظار التالي. قد يخفض الكمون عشرات المللي ثانية. أوقفه عند ظهور تشوهات أو تجمّد. يُطبَّق عند الاتصال القادم.</string>
-    <string name="settings_fps_counter">عدّاد FPS</string>
-    <string name="settings_fps_counter_description">عدّاد في الزاوية العلوية اليمنى: إطارات معروضة في الثانية (أخضر من 50، أصفر من 30، أحمر أقل)، إطارات مستلمة من الـ iPhone في الثانية، وزمن فك الترميز. الشاشة الساكنة تعرض قليلًا لأن الـ iPhone لا يرسل إطارات.</string>
     <string name="car_button_in_carplay">زر السيارة في CarPlay</string>
     <string name="car_button_icon">الأيقونة</string>
     <string name="car_button_icon_custom">أيقونة مخصصة</string>

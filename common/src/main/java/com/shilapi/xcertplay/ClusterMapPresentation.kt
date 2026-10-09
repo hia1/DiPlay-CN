@@ -22,9 +22,8 @@ import android.view.SurfaceHolder
 import android.view.SurfaceView
 import android.view.View
 import android.view.TextureView
-import android.content.res.ColorStateList
 import android.widget.FrameLayout
-import android.widget.ProgressBar
+import android.widget.TextView
 import com.shilapi.xcertplay.airplay.CarPlayClusterDisplay
 import com.shilapi.xcertplay.host.R
 import com.shilapi.xcertplay.hud.ClusterTurnGuidance
@@ -42,8 +41,7 @@ internal class ClusterMapPresentation(
     private val theme: DiLink51ClusterLayout.Theme = DiLink51ClusterLayout.theme(context),
     private val onSurface: (Surface?) -> Unit,
 ) : Presentation(context, display) {
-    // The placeholder until the map arrives: a small spinner.
-    private var waitingLabel: View? = null
+    private var waitingLabel: TextView? = null
     private var turnCardView: ClusterTurnCardView? = null
     private var videoView: View? = null
     private var streamActive = false
@@ -57,12 +55,10 @@ internal class ClusterMapPresentation(
         val size = sizeOf(display)
         val adaptive = DiLink51ClusterLayout.supported()
         val plan = if (adaptive) DiLink51ClusterLayout.plan(size.x, size.y, theme) else null
-        // The adaptive DiLink 5.1 layout follows the cluster's own contrast; elsewhere the cluster follows DiPlay's theme.
-        val dark = if (plan != null) DiLink51ClusterLayout.dark(context, theme) else context.resolveAppNightNow()
+        val dark = DiLink51ClusterLayout.dark(context, theme)
         val backdrop = if (dark) Color.rgb(15, 22, 30) else Color.rgb(207, 218, 229)
-        val placeholder = if (dark) Color.BLACK else Color.rgb(233, 238, 246)
         val root = FrameLayout(context).apply {
-            setBackgroundColor(if (plan == null) placeholder else if (plan.fullMap) backdrop else Color.TRANSPARENT)
+            setBackgroundColor(if (plan == null) Color.rgb(233, 238, 246) else if (plan.fullMap) backdrop else Color.TRANSPARENT)
         }
         if (plan != null) {
             window?.setBackgroundDrawable(ColorDrawable(Color.TRANSPARENT))
@@ -124,15 +120,12 @@ internal class ClusterMapPresentation(
             root.addView(surfaceView, videoParams)
             videoView = surfaceView
         }
-        val waitingColor = if (dark) Color.WHITE else Color.DKGRAY
-        val density = context.resources.displayMetrics.density
-        waitingLabel = FrameLayout(context).apply {
-            if (plan == null) setBackgroundColor(placeholder)
-            addView(ProgressBar(context).apply {
-                isIndeterminate = true
-                indeterminateTintList = ColorStateList.valueOf(waitingColor)
-                contentDescription = context.getString(R.string.cluster_waiting_for_map)
-            }, FrameLayout.LayoutParams((40 * density).toInt(), (40 * density).toInt(), Gravity.CENTER))
+        waitingLabel = TextView(context).apply {
+            text = context.getString(R.string.cluster_waiting_for_map)
+            setTextColor(if (plan != null && dark) Color.WHITE else Color.DKGRAY)
+            if (plan == null) setBackgroundColor(Color.rgb(233, 238, 246))
+            textSize = 26f
+            gravity = Gravity.CENTER
         }
         root.addView(waitingLabel, FrameLayout.LayoutParams(videoParams))
         turnCardView = ClusterTurnCardView(context).apply { visibility = View.GONE }
