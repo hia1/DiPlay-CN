@@ -1,13 +1,13 @@
-# DiPlay CN {{VERSION}}
+# Lodestar {{VERSION}}
 
-基于官方 DiPlay v0.2.15。包名 `com.shihab.diplay.cn`，可与官方版并存。覆盖安装上一版 CN 即可保留设置。
+基于官方 DiPlay v0.2.15。包名 `com.hia1.lodestar`，可与官方版并存。覆盖安装上一版 Lodestar 即可保留设置。
 
 **测试范围：** 实车验证车辆为 **2025 款比亚迪汉 DM-i，车机 DiLink 5.0**。其他车型、其他车机系统不保证所有功能可用；请自行测试，或拉取源代码按本车修改。
 
 **下载**
 
-- APK：本 Release 附带的 `DiPlay-cn-v{{VERSION}}.apk`（Gitee 同步：https://gitee.com/oneeyear/DiPlay-CN/releases/latest）
-- 完整优化记录：[docs/CN_OPTIMIZATIONS.md](https://github.com/serein-morii/DiPlay-CN/blob/main/docs/CN_OPTIMIZATIONS.md)
+- APK：本 Release 附带的 `Lodestar-v{{VERSION}}.apk`
+- 完整优化记录：[docs/CN_OPTIMIZATIONS.md](https://github.com/hia1/DiPlay-CN/blob/main/docs/CN_OPTIMIZATIONS.md)
 
 **本版更新**
 
@@ -20,7 +20,7 @@
 **免责声明与法律声明**
 
 - **独立项目**：本软件为个人学习与技术研究所用的独立社区项目，非 Apple 认证产品（未参与 MFi 计划），与 Apple Inc.、比亚迪（BYD）及其任何关联公司不存在隶属、合作、代理、背书或授权关系。本项目不以任何形式暗示相反内容。
-- **商标**：“Apple”“CarPlay”“iPhone”是 Apple Inc. 的商标，“BYD”“比亚迪”是其权利人的商标。本项目仅在说明兼容性与功能所必需的范围内以叙述方式使用上述词汇，不作商品名称、标识或宣传用途；应用内“应用名称”选项仅为使用者在本机自行选择的个性化显示，项目自身名称始终为 DiPlay CN。请在遵守商标权人条款及当地法律的前提下使用。
+- **商标**：“Apple”“CarPlay”“iPhone”是 Apple Inc. 的商标，“BYD”“比亚迪”是其权利人的商标。本项目仅在说明兼容性与功能所必需的范围内以叙述方式使用上述词汇，不作商品名称、标识或宣传用途；应用内“应用名称”选项仅为使用者在本机自行选择的个性化显示，项目自身名称始终为 Lodestar。请在遵守商标权人条款及当地法律的前提下使用。
 - **技术边界**：本项目不包含任何 Apple 专有代码、协议密钥或受保护技术资料，不破解、不规避任何数字版权保护或技术保护措施；运行所用配件身份为从公开渠道获得的既有实验性数据，其来源与局限见仓库文档。
 - **非商业**：本软件免费提供，不销售、不内置广告、不收集用户数据用于商业目的。
 - **免责与责任**：本软件按“现状”提供，不作任何明示或默示保证（含适销性、特定用途适用性、不侵权）。不保证在所有车机、固件、Android/iOS 版本上可用。因下载、安装、使用或分发本软件产生的任何直接或间接损失（包括设备损坏、数据丢失、车辆功能异常、保修受影响或交通事故），作者与贡献者不承担责任。请在停车时安装与设置，驾驶中请勿操作。

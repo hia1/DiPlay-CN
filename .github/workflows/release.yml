@@ -15,6 +15,9 @@ jobs:
     env:
       OFFICIAL_APK_URL: https://github.com/shihabal3amri/DiPlay/releases/download/v0.2.14/DiPlay-0.2.14.apk
       OFFICIAL_APK_SHA256: 62b31f79db32bc7c85013ae830460b697a5952fad571ed0030b97341dde0b2e3
+      # Optional mirror sync. Without the secret the step is skipped instead of failing the release.
+      GITEE_TOKEN: ${{ secrets.GITEE_TOKEN }}
+      GITEE_REPO: ${{ vars.GITEE_REPO }}
     steps:
       - uses: actions/checkout@v4
       - name: Reject credential files in public source
@@ -46,6 +49,29 @@ jobs:
             echo "::error::tag $GITHUB_REF_NAME does not match versionName $version"
             exit 1
           fi
+      - name: Provision the Lodestar release keystore
+        env:
+          KEYSTORE_BASE64: ${{ secrets.LODESTAR_KEYSTORE_BASE64 }}
+          KEYSTORE_PASSWORD: ${{ secrets.LODESTAR_KEYSTORE_PASSWORD }}
+          KEY_ALIAS: ${{ secrets.LODESTAR_KEY_ALIAS }}
+          KEY_PASSWORD: ${{ secrets.LODESTAR_KEY_PASSWORD }}
+        shell: bash
+        run: |
+          set -euo pipefail
+          for name in KEYSTORE_BASE64 KEYSTORE_PASSWORD KEY_ALIAS KEY_PASSWORD; do
+            if [ -z "${!name:-}" ]; then
+              echo "::error::repository secret $name is not configured; releases must be signed with the Lodestar key"
+              exit 1
+            fi
+          done
+          store="$RUNNER_TEMP/lodestar-release.jks"
+          printf '%s' "$KEYSTORE_BASE64" | base64 -d > "$store"
+          {
+            echo "ANDROID_KEYSTORE_PATH=$store"
+            echo "ANDROID_KEYSTORE_PASSWORD=$KEYSTORE_PASSWORD"
+            echo "ANDROID_KEY_ALIAS=$KEY_ALIAS"
+            echo "ANDROID_KEY_PASSWORD=$KEY_PASSWORD"
+          } >> "$GITHUB_ENV"
       - name: Test and build standalone release APK
         run: ./gradlew :shared:testDebugUnitTest :common:testDebugUnitTest :mobile:lintRelease :mobile:assembleStandaloneRelease --stacktrace > gradle.log 2>&1 || { cat gradle.log | tail -120; exit 1; }
       - name: Verify identity is inside the APK and not in git
@@ -57,7 +83,7 @@ jobs:
         shell: bash
         run: |
           set -euo pipefail
-          apk="DiPlay-cn-${GITHUB_REF_NAME}.apk"
+          apk="Lodestar-${GITHUB_REF_NAME}.apk"
           cp mobile/build/outputs/apk/release/mobile-release.apk "$apk"
           sha256sum "$apk" > "$apk.sha256"
           cp docs/GITHUB_RELEASE.md release-notes.md
@@ -68,18 +94,17 @@ jobs:
         shell: bash
         run: |
           set -euo pipefail
-          apk="DiPlay-cn-${GITHUB_REF_NAME}.apk"
+          apk="Lodestar-${GITHUB_REF_NAME}.apk"
           gh release delete "$GITHUB_REF_NAME" --repo "$GITHUB_REPOSITORY" --yes || true
           gh release create "$GITHUB_REF_NAME" \
-            "$apk#DiPlay CN" \
+            "$apk#Lodestar" \
             "$apk.sha256#SHA-256" \
             --repo "$GITHUB_REPOSITORY" \
             --verify-tag \
-            --title "DiPlay CN ${GITHUB_REF_NAME#v}" \
+            --title "Lodestar ${GITHUB_REF_NAME#v}" \
             --notes-file release-notes.md
       - name: Sync APK to Gitee
-        env:
-          GITEE_TOKEN: ${{ secrets.GITEE_TOKEN }}
+        if: ${{ env.GITEE_TOKEN != '' }}
         shell: bash
         run: |
           set -euo pipefail
@@ -87,13 +112,14 @@ jobs:
             echo "::error::GITEE_TOKEN secret is not configured"
             exit 1
           fi
-          api="https://gitee.com/api/v5/repos/oneeyear/DiPlay-CN"
+          # Set the GITEE_REPO repository variable (owner/name) to sync into your own mirror.
+          api="https://gitee.com/api/v5/repos/${GITEE_REPO:-oneeyear/DiPlay-CN}"
           id="$(curl -fsS "$api/releases/tags/$GITHUB_REF_NAME?access_token=$GITEE_TOKEN" | python3 -c 'import json,sys; print(json.load(sys.stdin).get("id") or "")' || true)"
           if [ -z "$id" ]; then
             code="$(curl -sS -o /tmp/gitee-create.json -w '%{http_code}' -X POST "$api/releases" \
               --data-urlencode "access_token=$GITEE_TOKEN" \
               --data-urlencode "tag_name=$GITHUB_REF_NAME" \
-              --data-urlencode "name=DiPlay CN ${GITHUB_REF_NAME#v}" \
+              --data-urlencode "name=Lodestar ${GITHUB_REF_NAME#v}" \
               --data-urlencode "target_commitish=main" \
               --data-urlencode "body=$(cat release-notes.md)")"
             id="$(python3 -c 'import json; print(json.load(open("/tmp/gitee-create.json")).get("id") or "")' 2>/dev/null || true)"
@@ -122,7 +148,7 @@ jobs:
             fi
             rm -f "$downloaded"
           }
-          for f in "DiPlay-cn-$GITHUB_REF_NAME.apk" "DiPlay-cn-$GITHUB_REF_NAME.apk.sha256"; do
+          for f in "Lodestar-$GITHUB_REF_NAME.apk" "Lodestar-$GITHUB_REF_NAME.apk.sha256"; do
             if verify_asset "$f"; then
               echo "Gitee asset already verified: $f"
               continue
