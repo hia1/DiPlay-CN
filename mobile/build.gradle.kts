@@ -1,3 +1,5 @@
+import java.util.Properties
+
 plugins {
     alias(libs.plugins.android.application)
     alias(libs.plugins.kotlin.compose)
@@ -14,7 +16,7 @@ android {
     }
 
     defaultConfig {
-        applicationId = "com.shihab.diplay.cn"
+        applicationId = "com.hia1.lodestar"
         minSdk = 25
         targetSdk = 37
         versionCode = 101
@@ -34,12 +36,16 @@ android {
                 keyAlias = providers.environmentVariable("ANDROID_KEY_ALIAS").getOrElse("")
                 keyPassword = providers.environmentVariable("ANDROID_KEY_PASSWORD").getOrElse("")
             } else {
-                // Stable CN key: CI runners are ephemeral, so a per-run debug key would change the
-                // signature on every build and users could not install updates over each other.
-                storeFile = rootProject.file("signing/diplay-cn.jks")
-                storePassword = "diplay-cn"
-                keyAlias = "diplaycn"
-                keyPassword = "diplay-cn"
+                // Release signing stays local (or comes from CI secrets). Never commit the store,
+                // so a source checkout builds debug but cannot accidentally publish a foreign key.
+                val signingProperties = rootProject.file("signing/lodestar-release.properties")
+                check(signingProperties.isFile) { "Release signing is not configured: create signing/lodestar-release.properties" }
+                val values = Properties().apply { signingProperties.inputStream().use(::load) }
+                fun required(key: String) = requireNotNull(values.getProperty(key)) { "Missing release signing property: $key" }
+                storeFile = rootProject.file(required("storeFile"))
+                storePassword = required("storePassword")
+                keyAlias = required("keyAlias")
+                keyPassword = required("keyPassword")
             }
         }
     }

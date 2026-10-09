@@ -66,9 +66,8 @@ internal class BydStandaloneHudOutput private constructor(context: Context) {
         fun available(context: Context): Boolean {
             if (Build.VERSION.SDK_INT < Build.VERSION_CODES.P) return false
             if (context.packageName !in setOf(
-                    "com.andrerinas.headunitrevived", "com.shihab.diplay",
-                    "com.andrerinas.headunitrevived.bydhudtest", "com.shihab.diplay.hudtest",
-                    "com.shihab.diplay.cn")) return false
+                    "com.andrerinas.headunitrevived", "com.hia1.lodestar",
+                    "com.andrerinas.headunitrevived.bydhudtest", "com.shihab.diplay.hudtest")) return false
             if (Build.FINGERPRINT != "BYD-AUTO/IVI/IVI:13/TP1A.220624.014/eng.build20260722.221155:user/release-keys") return false
             return runCatching {
                 val manager = context.packageManager
