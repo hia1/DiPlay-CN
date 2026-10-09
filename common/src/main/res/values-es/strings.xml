@@ -727,5 +727,4 @@
     <string name="setup_badge_adb">Requiere ADB por red</string>
     <string name="setup_done_title">Todo listo</string>
     <string name="setup_done_description">Conecta tu iPhone ahora. Podrás abrir esta guía otra vez desde Ajustes.</string>
-    <string name="cluster_small_window_card_opacity">Tarjeta de giro en miniatura · opacidad</string>
 </resources>

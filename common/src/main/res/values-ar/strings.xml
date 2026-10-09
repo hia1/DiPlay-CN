@@ -727,5 +727,4 @@
     <string name="setup_badge_adb">يحتاج ADB عبر الشبكة</string>
     <string name="setup_done_title">أنت جاهز</string>
     <string name="setup_done_description">اتصل بالـ iPhone الآن. يمكنك فتح الدليل مرة أخرى من الإعدادات.</string>
-    <string name="cluster_small_window_card_opacity">بطاقة المنعطف في النافذة الصغيرة · الشفافية</string>
 </resources>

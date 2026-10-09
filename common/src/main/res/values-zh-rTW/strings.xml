@@ -787,5 +787,4 @@
     <string name="setup_badge_adb">需要網路 ADB</string>
     <string name="setup_done_title">一切就緒</string>
     <string name="setup_done_description">現在連線你的 iPhone。之後可隨時從設定再次開啟精靈。</string>
-    <string name="cluster_small_window_card_opacity">小屏轉向卡 · 透明度</string>
 </resources>

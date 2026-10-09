@@ -8,6 +8,24 @@ import org.junit.Test
 
 class AirPlayInfoPlistTest {
     @Test
+    fun bothDisplaysDeclareAutomaticAppearanceAtConnection() {
+        val config = AirPlayConfig(
+            deviceName = "test", deviceId = "02:00:00:00:00:02", btMac = "02:00:00:00:00:02",
+            sourceVersion = "366.0",
+            main = AirPlayDisplayConfig(widthPixels = 1280, heightPixels = 720),
+            cluster = AirPlayDisplayConfig(widthPixels = 960, heightPixels = 360),
+        )
+        val displays = AirPlayInfoPlist.build(config)["displays"] as List<*>
+        assertEquals(2, displays.size)
+        for (display in displays) {
+            val fields = display as Map<*, *>
+            for (key in listOf("uiAppearanceMode", "uiAppearanceSetting", "mapAppearanceMode", "mapAppearanceSetting")) {
+                assertEquals(key, 0, fields[key])
+            }
+        }
+    }
+
+    @Test
     fun defaultDisplayIncludesFullViewAndSafeAreas() {
         val info = AirPlayInfoPlist.build(
             AirPlayConfig(
@@ -211,6 +229,24 @@ class AirPlayInfoPlistTest {
             0x70004154,
             telephony(AirPlayInfoPlist.build(base.copy(microphone = true)))["audioInputFormats"],
         )
+
+        // No Opus encoder below API 29, so a unit that offered Opus there was never heard.
+        val withoutOpus = AirPlayInfoPlist.build(base.copy(microphone = true, microphoneOpus = false))
+        assertEquals(0x4154, telephony(withoutOpus)["audioInputFormats"])
+        assertEquals(0x4154, defaultAudio(withoutOpus)["audioInputFormats"])
+        assertEquals(
+            0x4154,
+            (withoutOpus["audioFormats"] as List<*>)
+                .map { it as Map<*, *> }
+                .single { it["audioType"] == "speechRecognition" }["audioInputFormats"],
+        )
+        // Output is untouched: the Opus decoder exists from API 21, only the encoder is missing.
+        assertEquals(
+            telephony(AirPlayInfoPlist.build(base.copy(microphone = true)))["audioOutputFormats"],
+            telephony(withoutOpus)["audioOutputFormats"],
+        )
+        assertFalse(telephony(AirPlayInfoPlist.build(base.copy(microphoneOpus = false)))
+            .containsKey("audioInputFormats"))
     }
 
     @Test

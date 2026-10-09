@@ -1074,14 +1074,13 @@ class CarPlayHostActivity : ComponentActivity() {
             else -> cardNight
         }
         val effectiveNight = if (smallWindow) smallCardNight else cardNight
-        val effectiveOpacity = if (smallWindow) AirPlayPersistence.loadClusterSmallWindowCardOpacityPercent(this)
-        else AirPlayPersistence.loadClusterTurnCardOpacityPercent(this)
         ClusterActivityOutput.setTurnCard(if (overlay) clusterTurnGuidance else null,
-            xPercent, yPercent, sizePercent, effectiveOpacity, effectiveNight)
+            xPercent, yPercent, sizePercent,
+            AirPlayPersistence.loadClusterTurnCardOpacityPercent(this), effectiveNight)
         val presentations = (clusterLayers.values + listOfNotNull(clusterPresentation)).distinct()
         for (presentation in presentations) {
             presentation.setTurnCardOverlay(xPercent, yPercent, sizePercent)
-            presentation.setTurnCardOpacity(effectiveOpacity)
+            presentation.setTurnCardOpacity(AirPlayPersistence.loadClusterTurnCardOpacityPercent(this))
             presentation.setTurnCardNightMode(effectiveNight)
             presentation.setTurnCardGuidance(if (overlay) clusterTurnGuidance else null)
         }
@@ -2270,38 +2269,6 @@ class CarPlayHostActivity : ComponentActivity() {
             ).apply { topMargin = dp(6) },
         )
 
-        // Modern two-column reflow on wide panels: category groups balance across columns with
-        // a hairline divider; the hero stays full-width above. Narrow windows keep one column.
-        if (resources.displayMetrics.widthPixels >= dp(1000) && content.childCount > 6) {
-            val columnLeft = LinearLayout(this).apply { orientation = LinearLayout.VERTICAL }
-            val columnRight = LinearLayout(this).apply { orientation = LinearLayout.VERTICAL }
-            val hero = mutableListOf<View>()
-            val groups = mutableListOf<MutableList<View>>()
-            var open = false
-            for (i in 0 until content.childCount) {
-                val child = content.getChildAt(i)
-                if (child.tag == "settings-category") { groups.add(mutableListOf(child)); open = true }
-                else if (open) groups.last().add(child) else hero.add(child)
-            }
-            var leftW = 0
-            var rightW = 0
-            groups.forEach { group ->
-                val target = if (leftW <= rightW) { leftW += group.size; columnLeft } else { rightW += group.size; columnRight }
-                group.forEach { v -> target.addView(v) }
-            }
-            for (i in content.childCount - 1 downTo 0) content.removeViewAt(i)
-            hero.forEach(content::addView)
-            val row = LinearLayout(this).apply { orientation = LinearLayout.HORIZONTAL }
-            row.addView(columnLeft, LinearLayout.LayoutParams(0, ViewGroup.LayoutParams.WRAP_CONTENT, 1f))
-            row.addView(View(this).apply { setBackgroundColor(0x26FFFFFF) },
-                LinearLayout.LayoutParams(dp(1), ViewGroup.LayoutParams.MATCH_PARENT).apply {
-                    leftMargin = dp(16); rightMargin = dp(16)
-                })
-            row.addView(columnRight, LinearLayout.LayoutParams(0, ViewGroup.LayoutParams.WRAP_CONTENT, 1f))
-            content.addView(row, LinearLayout.LayoutParams(
-                ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT))
-        }
-
         val scroll = ScrollView(this).apply {
             isFillViewport = true
             addView(
@@ -2656,7 +2623,6 @@ class CarPlayHostActivity : ComponentActivity() {
     }
 
     private fun settingsCategoryHeader(title: String): View = LinearLayout(this).apply {
-        tag = "settings-category"
         orientation = LinearLayout.VERTICAL
         val head = LinearLayout(this@CarPlayHostActivity).apply {
             orientation = LinearLayout.HORIZONTAL
@@ -3874,6 +3840,7 @@ class CarPlayHostActivity : ComponentActivity() {
             rightHandDrive = rightHandDrive,
             hevc = hevcEnabled,
             microphone = microphoneAvailable,
+            microphoneOpus = com.shilapi.xcertplay.media.OpusEncoderSupport.isAvailable(),
             manufacturer = normalizedManufacturer(),
             model = normalizedModel(),
             oemLabel = oemLabel,

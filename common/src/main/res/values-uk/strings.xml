@@ -739,5 +739,4 @@
     <string name="setup_badge_adb">Потрібен ADB по мережі</string>
     <string name="setup_done_title">Усе готово</string>
     <string name="setup_done_description">Підключіть iPhone зараз. Майстер можна знову відкрити з налаштувань.</string>
-    <string name="cluster_small_window_card_opacity">Картка маневру в міні-вікні · прозорість</string>
 </resources>

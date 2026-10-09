@@ -611,6 +611,7 @@ class AndroidMediaSink(
         // Only the main screen goes to the host's SurfaceView; mirrors and the cluster keep their path.
         pacingDelayNanos = if (type == MAIN_SCREEN_TYPE && statsLabel == null) videoPacingDelayMillis * 1_000_000L else 0L,
         operatingRate = videoOperatingRate(type, statsLabel, mainVideoFrameRate),
+        framesAtOnce = type == MAIN_SCREEN_TYPE && statsLabel == null && videoPacingDelayMillis > 0,
     ).also { if (startImmediately) it.start() }
 
     @Synchronized
@@ -709,9 +710,16 @@ internal data class DecoderAttempt(val codecName: String?, val tuned: Boolean, v
 /**
  * Configure attempts in order. Some vendor decoders (e.g. MediaTek c2.mtk.avc.decoder) reject the tuned
  * parameters with BAD_VALUE, so a minimal format and then software follow. An [operatingRate] is tried
- * first on its own, so a decoder that refuses it keeps the tuned format it gets without one.
+ * first on its own, so a decoder that refuses it keeps the tuned format it gets without one. A
+ * [lowLatencyDecoder] gets its tuned attempts before the default decoder's.
  */
-internal fun videoDecoderAttempts(operatingRate: Int, softwareDecoder: String?): List<DecoderAttempt> = listOfNotNull(
+internal fun videoDecoderAttempts(
+    operatingRate: Int,
+    softwareDecoder: String?,
+    lowLatencyDecoder: String? = null,
+): List<DecoderAttempt> = listOfNotNull(
+    lowLatencyDecoder?.let { DecoderAttempt(it, tuned = true, operatingRate = operatingRate).takeIf { operatingRate > 0 } },
+    lowLatencyDecoder?.let { DecoderAttempt(it, tuned = true) },
     DecoderAttempt(codecName = null, tuned = true, operatingRate = operatingRate).takeIf { operatingRate > 0 },
     DecoderAttempt(codecName = null, tuned = true),
     DecoderAttempt(codecName = null, tuned = false),
@@ -724,6 +732,29 @@ internal fun videoDecoderAttempts(operatingRate: Int, softwareDecoder: String?):
  */
 internal fun nextOperatingRate(requested: Int, used: DecoderAttempt?): Int =
     if (requested > 0 && used != null && used.operatingRate == 0) 0 else requested
+
+/** One regular decoder of the stream's type, as [lowLatencyDecoderName] sees it. */
+internal data class DecoderCandidate(val name: String, val hardware: Boolean, val alias: Boolean, val lowLatency: Boolean)
+
+/**
+ * The decoder the main screen tries first with smooth video: the first hardware decoder (not an alias) that
+ * advertises the low-latency feature, whose tuned format then asks for low latency. On my Tang this is
+ * c2.qti.avc.decoder.low_latency; the default c2.qti.avc.decoder does not advertise the feature.
+ */
+internal fun lowLatencyDecoderName(candidates: List<DecoderCandidate>): String? =
+    candidates.firstOrNull { it.lowLatency && it.hardware && !it.alias }?.name
+
+/** The low-latency decoder to try at the next configure: none once another decoder ([used]) worked after it. */
+internal fun nextLowLatencyDecoder(requested: String?, used: DecoderAttempt?): String? =
+    if (requested != null && used != null && used.codecName != requested) null else requested
+
+/**
+ * Qualcomm's decoder parameter for output in decoding order. Without it my Tang's decoders released a frame
+ * only once one or two later frames had been queued. Decoding order is the display order only for a stream
+ * without reordered (B) frames; the iPhone's CarPlay H.264 had none. It is set only for the main screen's H.264
+ * with smooth video, and only on a decoder that lists the parameter.
+ */
+internal const val PICTURE_ORDER_PARAMETER = "vendor.qti-ext-dec-picture-order.enable"
 
 /** Serial MediaCodec video decoder: one worker owns configure and frame feeding. */
 private class VideoDecoder(
@@ -739,6 +770,11 @@ private class VideoDecoder(
     /** Called on the worker as its last step, after it has released its codec. */
     private val onExit: (VideoDecoder) -> Unit = {},
     operatingRate: Int = 0,
+    /**
+     * The main screen with smooth video: for H.264, try a low-latency decoder first ([lowLatencyDecoderName]) and
+     * ask decoders that list it for [PICTURE_ORDER_PARAMETER], so each frame leaves the decoder as soon as it can.
+     */
+    private val framesAtOnce: Boolean = false,
 ) : Closeable {
     private val pacer = FramePacer()
     private val pacingDelay = if (pacingDelayNanos > 0) PacingDelay(pacingDelayNanos) else null
@@ -769,10 +805,16 @@ private class VideoDecoder(
     // the current codec was configured with.
     private var operatingRate = operatingRate
     private var configuredRate = 0
+    // Likewise the low-latency decoder, not tried again once another decoder had to take over; and what the
+    // codec that tryConfigure started last was given.
+    private var lowLatencyDecoderRefused = false
+    private var startedLowLatency = false
+    private var startedPictureOrder = false
     private var submittedFrameLogged = false
     private var duplicateConfigLogged = false
     private var failureReports = 0
     private val referenceChain = VideoReferenceChain()
+    private val backlogRecovery = VideoBacklogRecovery()
     private var lastKeyFrameRequestNs = 0L
     // The main screen keeps the historical log format; other screens are labelled.
     private val stats = VideoStats(statsLabel ?: if (streamType == MAIN_SCREEN_TYPE) "" else " stream=$streamType")
@@ -842,10 +884,14 @@ private class VideoDecoder(
                     when (job) {
                         is VideoJob.Config -> configureDecoder(job)
                         is VideoJob.Frame -> {
-                            if (System.nanoTime() - job.receivedNs > MAX_FRAME_AGE_NS) {
-                                queue.discardFrames()
-                                recover("video backlog exceeded 250 ms")
-                            } else feed(job.nalus, localTimeOf(job))
+                            val backlog = queue.backlogAfterCurrent()
+                            val overloaded = !referenceChain.needsKeyFrame && backlogRecovery.observe(
+                                System.nanoTime(), job.receivedNs,
+                                backlog.pendingFrames, backlog.newestPendingReceivedNs,
+                            )
+                            if (overloaded) {
+                                recover("video backlog kept growing or exceeded hard limit")
+                            } else feed(job.nalus, localTimeOf(job), job.receivedNs)
                         }
                         is VideoJob.SurfaceChanged -> changeSurface(job.surface)
                         is VideoJob.DetachSurface -> detach(job.request)
@@ -869,6 +915,7 @@ private class VideoDecoder(
                         dropOperatingRate("codec failed before its first frame")
                     }
                     releaseDecoder()
+                    queue.discardCurrentChain()
                     referenceChain.reset()
                     requestKeyFrameIfDue()
                 } catch (error: LinkageError) {
@@ -921,23 +968,31 @@ private class VideoDecoder(
             )
         }
         val requestedRate = operatingRate
+        val atOnce = framesAtOnce && codec == VideoCodec.H264
+        val requestedLowLatency = if (atOnce && !lowLatencyDecoderRefused) findLowLatencyDecoder(mime) else null
         var next: MediaCodec? = null
         var used: DecoderAttempt? = null
-        for (attempt in videoDecoderAttempts(requestedRate, softwareDecoderName(mime))) {
-            next = tryConfigure(mime, csd, surface, attempt)
+        for (attempt in videoDecoderAttempts(requestedRate, softwareDecoderName(mime), requestedLowLatency)) {
+            next = tryConfigure(mime, csd, surface, attempt, atOnce)
             if (next != null) { used = attempt; break }
         }
         if (next == null) {
+            queue.discardCurrentChain()
             report("decoder configuration failed mime=$mime size=${width}x$height")
         }
         if (nextOperatingRate(requestedRate, used) != requestedRate) dropOperatingRate("refused at configure")
+        if (nextLowLatencyDecoder(requestedLowLatency, used) != requestedLowLatency) {
+            report("low-latency decoder $requestedLowLatency dropped: refused at configure")
+            lowLatencyDecoderRefused = true
+        }
         decoder = next
         configuredRate = used?.operatingRate ?: 0
         renderedFrameLogged = false
         submittedFrameLogged = false
         if (next != null) {
             val rate = if (requestedRate > 0) " operatingRate=$configuredRate" else ""
-            report("decoder=${next.name} mime=$mime size=${width}x$height$rate")
+            val atOnceReport = if (atOnce) " lowLatency=$startedLowLatency pictureOrder=$startedPictureOrder" else ""
+            report("decoder=${next.name} mime=$mime size=${width}x$height$rate$atOnceReport")
             Log.i(
                 TAG,
                 "video decoder configured name=${next.name} mime=$mime size=${width}x$height",
@@ -965,31 +1020,71 @@ private class VideoDecoder(
         csd: List<ByteArray>,
         surface: Surface,
         attempt: DecoderAttempt,
+        /** Ask for [PICTURE_ORDER_PARAMETER] when the decoder lists it ([framesAtOnce], H.264). */
+        atOnce: Boolean = false,
     ): MediaCodec? {
         var candidate: MediaCodec? = null
+        var codecName = attempt.codecName ?: "default"
+        var phase = "create"
+        var phaseStartNs = System.nanoTime()
+        val startedNs = phaseStartNs
         return try {
             val format = buildFormat(mime, csd, attempt)
             val codec = attempt.codecName?.let { MediaCodec.createByCodecName(it) } ?: createDecoder(mime)
             candidate = codec
-            if (attempt.tuned && Build.VERSION.SDK_INT >= Build.VERSION_CODES.R &&
-                codec.codecInfo.getCapabilitiesForType(mime).isFeatureSupported("low-latency")) {
-                format.setInteger(MediaFormat.KEY_LOW_LATENCY, 1)
-            }
+            codecName = runCatching { codec.name }.getOrDefault(codecName)
+            phase = "configure"
+            phaseStartNs = System.nanoTime()
+            val lowLatency = attempt.tuned && Build.VERSION.SDK_INT >= Build.VERSION_CODES.R &&
+                codec.codecInfo.getCapabilitiesForType(mime).isFeatureSupported("low-latency")
+            if (lowLatency) format.setInteger(MediaFormat.KEY_LOW_LATENCY, 1)
+            val pictureOrder = attempt.tuned && atOnce && listsPictureOrder(codec)
+            if (pictureOrder) format.setInteger(PICTURE_ORDER_PARAMETER, 1)
             codec.configure(format, surface, null, 0)
+            phase = "start"
+            phaseStartNs = System.nanoTime()
             codec.start()
+            startedLowLatency = lowLatency
+            startedPictureOrder = pictureOrder
             codec
         } catch (error: Exception) {
-            runCatching { candidate?.release() }
+            val phaseMs = (System.nanoTime() - phaseStartNs) / 1_000_000
+            val elapsedMs = (System.nanoTime() - startedNs) / 1_000_000
+            runCatching { candidate?.release() }.onFailure {
+                Log.w(TAG, "video decoder candidate release failed name=$codecName", it)
+            }
             reportFailure("stage=configure tuned=${attempt.tuned} operatingRate=${attempt.operatingRate} mime=$mime", error)
             Log.w(
                 TAG,
-                "video decoder configure failed name=${attempt.codecName ?: "default"} " +
+                "video decoder configure failed name=$codecName phase=$phase phaseMs=$phaseMs elapsedMs=$elapsedMs " +
                     "tuned=${attempt.tuned} operatingRate=${attempt.operatingRate} mime=$mime size=${width}x$height",
                 error,
             )
             null
         }
     }
+
+    /** Android 11 added the low-latency feature; aliases and software-only flags exist from Android 10. */
+    private fun findLowLatencyDecoder(mime: String): String? {
+        if (Build.VERSION.SDK_INT < Build.VERSION_CODES.R) return null
+        return runCatching {
+            lowLatencyDecoderName(MediaCodecList(MediaCodecList.REGULAR_CODECS).codecInfos
+                .filter { !it.isEncoder && mime in it.supportedTypes }
+                .map { info ->
+                    DecoderCandidate(
+                        name = info.name,
+                        hardware = info.isHardwareAccelerated,
+                        alias = info.isAlias,
+                        lowLatency = info.getCapabilitiesForType(mime).isFeatureSupported("low-latency"),
+                    )
+                })
+        }.getOrNull()
+    }
+
+    /** Android 12 lets a codec list its vendor parameters. */
+    private fun listsPictureOrder(codec: MediaCodec): Boolean =
+        Build.VERSION.SDK_INT >= Build.VERSION_CODES.S &&
+            runCatching { PICTURE_ORDER_PARAMETER in codec.supportedVendorParameters }.getOrDefault(false)
 
     private fun softwareDecoderName(mime: String): String? {
         if (Build.VERSION.SDK_INT < Build.VERSION_CODES.Q) return null
@@ -1063,6 +1158,7 @@ private class VideoDecoder(
         outputSurface = surface
         if (surface == null) {
             releaseDecoder()
+            queue.discardCurrentChain()
             Log.i(TAG, "video decoder detached from surface")
             return
         }
@@ -1077,10 +1173,12 @@ private class VideoDecoder(
             }
         }
         releaseDecoder()
+        queue.discardCurrentChain()
+        referenceChain.reset()
         lastConfig?.let(::configureDecoder)
     }
 
-    private fun feed(nalus: ByteArray, presentNs: Long = 0L) {
+    private fun feed(nalus: ByteArray, presentNs: Long = 0L, receivedNs: Long = 0L) {
         val annexB = MediaCodecSupport.toAnnexB(nalus)
         val config = lastConfig ?: return
         if (outputSurface == null) return
@@ -1091,6 +1189,15 @@ private class VideoDecoder(
         }
         if (decoder == null) configureDecoder(config)
         val codec = decoder ?: return
+        // A slow rebuild must not immediately restart on its obsolete triggering IDR.
+        if (receivedNs > 0 && referenceChain.needsKeyFrame && VideoRecoveryFrameAge.isObsolete(
+                System.nanoTime(), receivedNs, queue.backlogAfterCurrent(),
+            )) {
+            queue.discardCurrentChain()
+            backlogRecovery.reset()
+            requestKeyFrameIfDue()
+            return
+        }
         if (!submittedFrameLogged) {
             submittedFrameLogged = true
             Log.i(
@@ -1141,6 +1248,7 @@ private class VideoDecoder(
         report("recovery: $reason; waiting for keyframe")
         // Recreate with codec-specific data: flush can discard CSD before the first output.
         releaseDecoder()
+        queue.discardCurrentChain()
         referenceChain.reset()
         requestKeyFrameIfDue()
     }
@@ -1230,6 +1338,7 @@ private class VideoDecoder(
 
     @Synchronized
     private fun releaseDecoder() {
+        backlogRecovery.reset()
         val codec = decoder
         decoder = null
         configuredRate = 0
@@ -1263,6 +1372,15 @@ private class VideoDecoder(
         const val PAUSE_HELD_FRAMES = 3
         val START_CODE = byteArrayOf(0x00, 0x00, 0x00, 0x01)
     }
+}
+
+/** Use the existing hard backlog age only when a newer frame remains in this control segment. */
+internal object VideoRecoveryFrameAge {
+    fun isObsolete(nowNs: Long, receivedNs: Long, backlog: VideoDecodeQueue.Backlog): Boolean =
+        nowNs >= receivedNs && nowNs - receivedNs >= 1_500_000_000L &&
+            backlog.pendingFrames > 0 && backlog.newestPendingReceivedNs?.let {
+                it <= nowNs && it - receivedNs >= 100_000_000L
+            } == true
 }
 
 private fun MediaFormat.intOrNull(key: String): Int? =
@@ -1800,17 +1918,22 @@ private class AudioRenderer(
                             )
                         }
                     }
-                    if (size > 0) {
-                        val output = codec.getOutputBuffer(index)
-                        if (output != null) {
-                            if (size > pcm.size) pcm = ByteArray(size)
-                            output.position(info.offset)
-                            output.limit(info.offset + size)
-                            output.get(pcm, 0, size)
-                            writePcm(pcm, 0, size)
+                    var copied = false
+                    try {
+                        if (size > 0) {
+                            val output = codec.getOutputBuffer(index)
+                            if (output != null) {
+                                if (size > pcm.size) pcm = ByteArray(size)
+                                output.position(info.offset)
+                                output.limit(info.offset + size)
+                                output.get(pcm, 0, size)
+                                copied = true
+                            }
                         }
+                    } finally {
+                        codec.releaseOutputBuffer(index, false)
                     }
-                    codec.releaseOutputBuffer(index, false)
+                    if (copied) writePcm(pcm, 0, size)
                     if (info.flags and MediaCodec.BUFFER_FLAG_END_OF_STREAM != 0) return
                 }
                 else -> return

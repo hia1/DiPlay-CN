@@ -787,5 +787,4 @@
     <string name="setup_badge_adb">需要网络 ADB</string>
     <string name="setup_done_title">一切就绪</string>
     <string name="setup_done_description">现在连接你的 iPhone。之后可随时从设置再次打开向导。</string>
-    <string name="cluster_small_window_card_opacity">小屏转向卡 · 透明度</string>
 </resources>
