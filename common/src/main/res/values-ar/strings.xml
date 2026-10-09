@@ -731,4 +731,10 @@
     <string name="setup_done_title">أنت جاهز</string>
     <string name="setup_done_description">اتصل بالـ iPhone الآن. يمكنك فتح الدليل مرة أخرى من الإعدادات.</string>
     <string name="cluster_small_window_card_opacity">بطاقة المنعطف في النافذة الصغيرة · الشفافية</string>
+    <string name="shows_carplay_map_on_selected_presentation_display">يعرض خريطة iPhone على شاشة العرض (Presentation) من Android التي تختارها. يستخدم هذا المسار واجهة العرض القياسية في النظام ولا يستدعي خدمة الشركة المصنّعة.</string>
+    <string name="center_map_card_generic_description">أثناء عمل DiPlay في الخلفية، تظهر خريطة لوحة العدادات المحددة أيضًا كبطاقة على الشاشة الرئيسية لوحدة الرأس. اضغط لفتح CarPlay، واسحب للنقل، وقرّب أو باعِد إصبعين لتغيير الحجم. يتطلب إذن الظهور فوق التطبيقات الأخرى.</string>
+    <string name="cluster_display_target">هدف عرض لوحة العدادات</string>
+    <string name="cluster_display_target_auto">تلقائي · استخدام الشاشة الوحيدة المكتشفة</string>
+    <string name="cluster_display_target_hint">اختر شاشة لوحة العدادات أو العرض الخاصة بوحدة الرأس. تأتي الأسماء والأبعاد من واجهة Android القياسية، دون الحاجة إلى خدمة الشركة المصنّعة. يؤدي التغيير إلى إعادة توصيل CarPlay.</string>
+    <string name="cluster_display_target_none">لم يتم العثور على شاشة Presentation عامة. لا يزال بإمكان CarPlay استخدام بث الخريطة الافتراضي لبطاقة الشاشة المركزية والودجات.</string>
 </resources>

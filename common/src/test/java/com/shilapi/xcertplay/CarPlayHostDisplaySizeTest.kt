@@ -1,5 +1,7 @@
 package com.shilapi.xcertplay
 
+import android.content.pm.ApplicationInfo
+import android.content.pm.PackageInfo
 import android.graphics.Matrix
 import android.os.Handler
 import android.os.Looper
@@ -457,6 +459,8 @@ class CarPlayHostDisplaySizeTest {
     }
 
     @Test fun adoptingBackgroundClusterRestoresNativeAdbFlagButRejectsTheVirtualFallback() {
+        // ADB cluster routing is a DiLink-only profile; make this head unit look like a BYD.
+        installBydSettingsPackage()
         AirPlayPersistence.saveAdbClusterEnabled(activity, true)
         val sink = AndroidMediaSink()
         val display = CarPlaySessionDisplay(1920, 990, Surface.ROTATION_0, true, true, 1920, 990)
@@ -473,6 +477,33 @@ class CarPlayHostDisplaySizeTest {
             AirPlayPersistence.saveAdbClusterEnabled(activity, false)
             sink.close()
         }
+    }
+
+    /** ADB cluster routing is gated behind the BYD profile; the generic profile must never use it. */
+    @Test fun genericProfileRejectsTheNativeAdbClusterFlag() {
+        AirPlayPersistence.saveAdbClusterEnabled(activity, true)
+        val sink = AndroidMediaSink()
+        val display = CarPlaySessionDisplay(1920, 990, Surface.ROTATION_0, true, true, 1920, 990)
+        try {
+            val controller = org.mockito.Mockito.mock(CarPlayController::class.java)
+            org.mockito.Mockito.`when`(controller.configuredClusterSize()).thenReturn(1920 to 720)
+            CarPlayBackgroundSession.store(controller, sink, 1920, 990, Any(), display) {}
+            assertEquals(true, invoke("adoptBackgroundSession"))
+            assertEquals(false, getField("adbClusterConfigured"))
+        } finally {
+            AirPlayPersistence.saveAdbClusterEnabled(activity, false)
+            sink.close()
+        }
+    }
+
+    private fun installBydSettingsPackage() {
+        shadowOf(activity.packageManager).installPackage(PackageInfo().apply {
+            packageName = "com.byd.carsettings"
+            applicationInfo = ApplicationInfo().apply {
+                packageName = "com.byd.carsettings"
+                flags = ApplicationInfo.FLAG_SYSTEM
+            }
+        })
     }
 
     private fun startSession(

@@ -41,6 +41,7 @@ object SetupGuide {
             listOf(
                 Entry(Feature.AUTO_CONNECT, Status.TESTED, needsAdb = false),
                 Entry(Feature.LOCATION, Status.TESTED, needsAdb = false),
+                Entry(Feature.CLUSTER_MAP, Status.EXPERIMENTAL, needsAdb = false),
             )
         } else {
             features(generation)

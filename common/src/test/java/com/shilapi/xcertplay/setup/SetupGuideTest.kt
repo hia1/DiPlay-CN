@@ -41,8 +41,9 @@ class SetupGuideTest {
 
     @Test fun genericHeadUnitGuideOffersOnlySafeCommonFeatures() {
         val features = SetupGuide.features(HeadUnitCapabilities.Family.GENERIC, DiLinkGeneration.UNKNOWN)
-        assertEquals(listOf(Feature.AUTO_CONNECT, Feature.LOCATION), features.map { it.feature })
-        assertTrue(features.all { it.status == Status.TESTED })
+        assertEquals(listOf(Feature.AUTO_CONNECT, Feature.LOCATION, Feature.CLUSTER_MAP), features.map { it.feature })
+        assertTrue(features.filter { it.feature != Feature.CLUSTER_MAP }.all { it.status == Status.TESTED })
+        assertEquals(Status.EXPERIMENTAL, features.first { it.feature == Feature.CLUSTER_MAP }.status)
         assertTrue(features.none { it.needsAdb })
     }
 

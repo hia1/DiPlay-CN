@@ -743,4 +743,10 @@
     <string name="setup_done_title">Усе готово</string>
     <string name="setup_done_description">Підключіть iPhone зараз. Майстер можна знову відкрити з налаштувань.</string>
     <string name="cluster_small_window_card_opacity">Картка маневру в міні-вікні · прозорість</string>
+    <string name="shows_carplay_map_on_selected_presentation_display">Показує карту iPhone на вибраному вами дисплеї-презентації Android. Використовується стандартний API Android, служба виробника не викликається.</string>
+    <string name="center_map_card_generic_description">Поки DiPlay працює у фоні, карта вибраної приборки також показується карткою на головному екрані головного пристрою. Торкніться, щоб відкрити CarPlay, перетягніть, щоб перемістити, і змініть розмір двома пальцями. Потрібен дозвіл на показ поверх інших застосунків.</string>
+    <string name="cluster_display_target">Цільовий дисплей приборки</string>
+    <string name="cluster_display_target_auto">Автоматично · використати єдиний знайдений дисплей</string>
+    <string name="cluster_display_target_hint">Виберіть дисплей приборки або проєкції головного пристрою. Назви та геометрія надходять з Android; служби виробника не потрібні. Зміна перепідключає CarPlay.</string>
+    <string name="cluster_display_target_none">Публічний дисплей-презентацію не знайдено. CarPlay усе ще може використовувати віртуальний потік карти для картки на центральному екрані та віджетів.</string>
 </resources>

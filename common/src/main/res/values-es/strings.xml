@@ -731,4 +731,10 @@
     <string name="setup_done_title">Todo listo</string>
     <string name="setup_done_description">Conecta tu iPhone ahora. Podrás abrir esta guía otra vez desde Ajustes.</string>
     <string name="cluster_small_window_card_opacity">Tarjeta de giro en miniatura · opacidad</string>
+    <string name="shows_carplay_map_on_selected_presentation_display">Muestra el mapa del iPhone en la pantalla de presentación de Android que elijas. Esta ruta usa la API estándar de Android y no llama a ningún servicio del fabricante.</string>
+    <string name="center_map_card_generic_description">Mientras DiPlay está en segundo plano, el mapa del cuadro seleccionado también aparece como una tarjeta en la pantalla de inicio del head unit. Toca para abrir CarPlay, arrastra para moverla y pellizca para cambiar su tamaño. Requiere permiso para mostrarse sobre otras aplicaciones.</string>
+    <string name="cluster_display_target">Pantalla objetivo del cuadro</string>
+    <string name="cluster_display_target_auto">Automático · usar la única pantalla detectada</string>
+    <string name="cluster_display_target_hint">Elige la pantalla del cuadro o de proyección del head unit. Los nombres y la geometría provienen de Android; no se requiere ningún servicio del fabricante. El cambio reconecta CarPlay.</string>
+    <string name="cluster_display_target_none">No se encontró ninguna pantalla de presentación pública. CarPlay aún puede usar el flujo de mapa virtual para la tarjeta en la pantalla central y los widgets.</string>
 </resources>

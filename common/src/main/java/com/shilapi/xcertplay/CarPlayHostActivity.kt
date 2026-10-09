@@ -959,7 +959,8 @@ class CarPlayHostActivity : ComponentActivity() {
             dismissClusterPresentation()
             return
         }
-        if (AdbClusterRouter.enabled(this)) {
+        val genericProfile = HeadUnitCapabilities.detect(this).isGeneric
+        if (!genericProfile && AdbClusterRouter.enabled(this)) {
             ClusterActivityOutput.bind(this, taskId) { onClusterSurface(it) }
             ClusterActivityOutput.setStreamActive(SCREEN_TYPE_ALT in activeScreenStreamTypes)
             applyClusterTurnOverlay()
@@ -970,7 +971,7 @@ class CarPlayHostActivity : ComponentActivity() {
         }
         ClusterActivityOutput.stop(this)
         val theme = effectiveClusterTheme()
-        if (DiLink51ClusterLayout.supported()) {
+        if (!genericProfile && DiLink51ClusterLayout.supported()) {
             ensureDiLink51ClusterPresentation(theme)
             return
         }
@@ -1104,15 +1105,16 @@ class CarPlayHostActivity : ComponentActivity() {
 
     private fun onClusterSurface(surface: Surface?) {
         if (clusterSurface === surface) return
+        val genericProfile = HeadUnitCapabilities.detect(this).isGeneric
         // A direct handoff lets MediaCodec.setOutputSurface preserve its reference frames.
         // Clearing first would destroy the decoder and can leave stream 111 waiting for an IDR.
-        if ((!DiLink51ClusterLayout.supported() && !AdbClusterRouter.enabled(this)) || surface == null) {
+        if ((!genericProfile && !DiLink51ClusterLayout.supported() && !AdbClusterRouter.enabled(this)) || surface == null) {
             clusterSurface?.let { old -> sink?.clearSurface(SCREEN_TYPE_ALT, old) }
         }
         clusterSurface = surface
         // Never fall back to the main surface: two decoders must not draw into one Surface.
         if (surface != null) {
-            if (AdbClusterRouter.enabled(this) && ClusterActivityOutput.hasConfirmedRoute() &&
+            if (!genericProfile && AdbClusterRouter.enabled(this) && ClusterActivityOutput.hasConfirmedRoute() &&
                 !adbClusterConfigured && controller != null) {
                 ClusterActivityOutput.setStreamActive(false)
                 reconnectAfterLoss("DiLink 4 cluster confirmed; requesting its native stream")
@@ -1147,7 +1149,8 @@ class CarPlayHostActivity : ComponentActivity() {
         clusterStreamOnDisplay = false
         requestedSmallWindowForStream = null
         if (!AirPlayPersistence.loadClusterMapEnabled(this)) return null
-        if (AdbClusterRouter.enabled(this) && ClusterActivityOutput.hasConfirmedRoute()) {
+        val genericProfile = HeadUnitCapabilities.detect(this).isGeneric
+        if (!genericProfile && AdbClusterRouter.enabled(this) && ClusterActivityOutput.hasConfirmedRoute()) {
             adbClusterConfigured = true
             clusterStreamOnDisplay = true
             return DiLink4ClusterDisplay.streamConfig(AirPlayPersistence.loadClusterContent(this),
@@ -1164,7 +1167,7 @@ class CarPlayHostActivity : ComponentActivity() {
             val size = ClusterMapPresentation.sizeOf(display)
             if (size.x > 0 && size.y > 0) {
                 clusterStreamOnDisplay = true
-                if (DiLink51ClusterLayout.supported()) {
+                if (!genericProfile && DiLink51ClusterLayout.supported()) {
                     val plan = DiLink51ClusterLayout.plan(size.x, size.y, theme) ?: return null
                     return DiLink51ClusterLayout.streamConfig().also {
                         MapMirrors.streamAspect = it.widthPixels.toDouble() / it.heightPixels
@@ -4266,7 +4269,8 @@ class CarPlayHostActivity : ComponentActivity() {
             return false
         }
         displayDiagnosticAttempt = DisplayDiagnosticSnapshot.currentAttempt(this)
-        adbClusterConfigured = AdbClusterRouter.enabled(this) && snapshot.controller.configuredClusterSize() ==
+        adbClusterConfigured = !HeadUnitCapabilities.detect(this).isGeneric && AdbClusterRouter.enabled(this) &&
+            snapshot.controller.configuredClusterSize() ==
             (DiLink4ClusterDisplay.STREAM_WIDTH to DiLink4ClusterDisplay.STREAM_HEIGHT)
         controller = snapshot.controller
         requestedSmallWindowForStream = snapshot.requestedSmallWindowForStream

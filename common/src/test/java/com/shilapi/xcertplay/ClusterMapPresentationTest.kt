@@ -160,6 +160,57 @@ class ClusterMapPresentationTest {
             ShadowDisplayManager.removeDisplay(other)
         }
     }
+
+    @Test fun genericLonePresentationIsSelectedAfterDashboardMapIsEnabled() {
+        val enabled = AirPlayPersistence.loadClusterMapEnabled(context)
+        val saved = AirPlayPersistence.loadClusterDisplayTarget(context)
+        AirPlayPersistence.saveClusterDisplayTarget(context, null)
+        AirPlayPersistence.saveClusterMapEnabled(context, true)
+        val id = display("Instrument cluster", "w1280dp-h480dp-mdpi")
+        try {
+            assertEquals(id, ClusterMapPresentation.findDisplay(context)?.displayId)
+        } finally {
+            ShadowDisplayManager.removeDisplay(id)
+            AirPlayPersistence.saveClusterDisplayTarget(context, saved)
+            AirPlayPersistence.saveClusterMapEnabled(context, enabled)
+        }
+    }
+
+    @Test fun genericSavedTargetWinsAmongMultiplePresentationDisplays() {
+        val enabled = AirPlayPersistence.loadClusterMapEnabled(context)
+        val saved = AirPlayPersistence.loadClusterDisplayTarget(context)
+        AirPlayPersistence.saveClusterMapEnabled(context, true)
+        val passenger = display("Passenger display", "w1920dp-h1080dp-mdpi")
+        val cluster = display("Instrument cluster", "w1280dp-h480dp-mdpi")
+        val target = GenericClusterDisplay.targetOf(manager.getDisplay(cluster))!!
+        GenericClusterDisplay.saveSelection(context, target)
+        try {
+            assertEquals(cluster, ClusterMapPresentation.findDisplay(context)?.displayId)
+        } finally {
+            ShadowDisplayManager.removeDisplay(cluster)
+            ShadowDisplayManager.removeDisplay(passenger)
+            AirPlayPersistence.saveClusterDisplayTarget(context, saved)
+            AirPlayPersistence.saveClusterMapEnabled(context, enabled)
+        }
+    }
+
+    @Test fun genericSavedTargetSurvivesARuntimeDisplayIdChange() {
+        val enabled = AirPlayPersistence.loadClusterMapEnabled(context)
+        val saved = AirPlayPersistence.loadClusterDisplayTarget(context)
+        AirPlayPersistence.saveClusterMapEnabled(context, true)
+        val first = display("Instrument cluster", "w1280dp-h480dp-mdpi")
+        val target = GenericClusterDisplay.targetOf(manager.getDisplay(first))!!
+        GenericClusterDisplay.saveSelection(context, target)
+        ShadowDisplayManager.removeDisplay(first)
+        val replacement = display("Instrument cluster", "w1280dp-h480dp-mdpi")
+        try {
+            assertEquals(replacement, ClusterMapPresentation.findDisplay(context)?.displayId)
+        } finally {
+            ShadowDisplayManager.removeDisplay(replacement)
+            AirPlayPersistence.saveClusterDisplayTarget(context, saved)
+            AirPlayPersistence.saveClusterMapEnabled(context, enabled)
+        }
+    }
     @Test fun dilink4MeasuredProjectionIsSelected() {
         val id = display(DiLink4ClusterDisplay.NAME, "w1920dp-h720dp-mdpi")
         try {

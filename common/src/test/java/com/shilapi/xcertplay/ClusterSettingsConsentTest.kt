@@ -1,6 +1,8 @@
 package com.shilapi.xcertplay
 
 import android.app.AlertDialog
+import android.content.pm.ApplicationInfo
+import android.content.pm.PackageInfo
 import android.os.Looper
 import android.view.Surface
 import android.view.View
@@ -41,6 +43,14 @@ class ClusterSettingsConsentTest {
         app.getSharedPreferences("diplay", 0).edit().clear().commit()
         // These existing sessions have already answered the optional notification prompt.
         app.getSharedPreferences("diplay", 0).edit().putBoolean("notification_asked", true).commit()
+        // The DiLink ADB cluster switch is a BYD-profile setting; make this head unit look like a BYD.
+        shadowOf(app.packageManager).installPackage(PackageInfo().apply {
+            packageName = "com.byd.carsettings"
+            applicationInfo = ApplicationInfo().apply {
+                packageName = "com.byd.carsettings"
+                flags = ApplicationInfo.FLAG_SYSTEM
+            }
+        })
         PendingReconnect.clear()
         CarPlayBackgroundSession.clear()
         ClusterActivityOutput.stopForSettings()

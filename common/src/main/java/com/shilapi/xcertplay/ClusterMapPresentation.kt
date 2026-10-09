@@ -30,11 +30,11 @@ import com.shilapi.xcertplay.host.R
 import com.shilapi.xcertplay.hud.ClusterTurnGuidance
 
 /**
- * Shows CarPlay's instrument-cluster stream on a BYD cluster projection display.
+ * Shows CarPlay's instrument-cluster stream on a presentation display.
  *
- * BYD exposes the cluster's projection area as public presentation displays owned by
- * com.byd.containerservice (DiLink 5) or com.xdja.containerservice (DiLink 4). The
- * cluster only shows this display while its projection mode is on, which DiPlay cannot switch.
+ * Generic Android head units expose the cluster through the public presentation-display API.
+ * Verified BYD profiles keep their measured display names and geometry, but are selected only
+ * as a compatibility profile; they are not required for the generic route.
  */
 internal class ClusterMapPresentation(
     context: Context,
@@ -198,10 +198,34 @@ internal class ClusterMapPresentation(
     companion object {
         const val TAG = "DiPlay-Cluster"
 
-        /** Keep the 5/5.1 selection order, then try the measured DiLink 4 projection display. */
-        fun findDisplay(context: Context, theme: DiLink51ClusterLayout.Theme = DiLink51ClusterLayout.theme(context)): Display? {
+        /**
+         * Prefer the measured BYD compatibility profiles when they are actually present. Otherwise,
+         * use a standard presentation display. A lone generic display is auto-selected only while
+         * the dashboard map is enabled; with several displays the user chooses one in Settings.
+         */
+        fun findDisplay(
+            context: Context,
+            theme: DiLink51ClusterLayout.Theme = DiLink51ClusterLayout.theme(context),
+            allowGenericAutomatic: Boolean = true,
+        ): Display? {
             val displays = context.getSystemService(DisplayManager::class.java)
-                ?.getDisplays(DisplayManager.DISPLAY_CATEGORY_PRESENTATION) ?: return null
+                ?.getDisplays(DisplayManager.DISPLAY_CATEGORY_PRESENTATION).orEmpty().toList()
+            if (displays.isEmpty()) return null
+            knownBydDisplay(displays, theme)?.let { return it }
+            if (!HeadUnitCapabilities.detect(context).isGeneric) return null
+            val targets = displays.mapNotNull(GenericClusterDisplay::targetOf)
+            val target = GenericClusterDisplay.resolve(
+                context,
+                targets = targets,
+                automaticWhenUnique = allowGenericAutomatic && AirPlayPersistence.loadClusterMapEnabled(context),
+            ) ?: return null
+            return displays.firstOrNull {
+                it.displayId == target.displayId && it.name.orEmpty() == target.name
+            }
+        }
+
+        /** Keep the existing DiLink 5/5.1 and measured DiLink 4 selection order. */
+        private fun knownBydDisplay(displays: List<Display>, theme: DiLink51ClusterLayout.Theme): Display? {
             val name = DiLink51ClusterLayout.displayName(
                 displays.map { it.name }, android.os.Build.FINGERPRINT, theme,
             )

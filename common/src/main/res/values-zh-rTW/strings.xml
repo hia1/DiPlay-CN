@@ -543,7 +543,9 @@
     <string name="center_map_auto_hide_description">開啟音樂、倒車影像、全螢幕設定等App時自動隱藏浮動視窗，返回桌面時自動恢復</string>
     <string name="center_map_auto_hide_active">離開桌面自動隱藏：已開啟（使用狀況存取權限 / 輔助使用服務）</string>
     <string name="center_map_auto_hide_needed">離開桌面自動隱藏：未開啟。請開啟輔助使用服務或透過 ADB 授予使用狀況存取權限。</string>
+    <string name="shows_carplay_map_on_selected_presentation_display">在你選擇的 Android Presentation 顯示器上顯示 iPhone 地圖。此路徑使用系統標準顯示介面，不呼叫廠商服務。</string>
     <string name="center_map_card_description">DiPlay 在背景運行時，儀表板地圖也會以卡片形式顯示在主螢幕上：比亞迪主螢幕、地圖主螢幕或你的預設啟動器。點選卡片開啟 CarPlay，拖曳可移動卡片，雙指縮放可調整大小。儀表板上的地圖不受影響。需要“顯示在其他App上層”權限。</string>
+    <string name="center_map_card_generic_description">DiPlay 在背景運行時，所選儀表地圖也會以卡片形式顯示在車機主螢幕上。點選開啟 CarPlay，拖曳移動，雙指縮放調整大小。需要「顯示在其他 App 上層」權限。</string>
     <string name="center_map_overlay_allowed">顯示在其他App上層：已允許</string>
     <string name="center_map_overlay_missing">顯示在其他應用程式上層：未允許。請在應用程式設定中允許，或透過 ADB：adb shell appops set %1$s SYSTEM_ALERT_WINDOW allow</string>
     <string name="center_map_usage_allowed">使用狀況存取權限：已允許，卡片只在主螢幕上顯示</string>
@@ -625,6 +627,10 @@
     <string name="cluster_safe_area_edit">儀表安全區域 · 編輯框</string>
     <string name="cluster_safe_area_reset">重設儀表安全區域</string>
     <string name="cluster_safe_area_hint">拖曳四條綠色邊界，儲存後在下次 CarPlay 連線時生效。自訂區域會替代車輛標記偏移，重設後恢復。</string>
+    <string name="cluster_display_target">儀表顯示目標</string>
+    <string name="cluster_display_target_auto">自動 · 使用唯一發現的顯示器</string>
+    <string name="cluster_display_target_hint">選擇車機提供的儀表或投影顯示器。名稱與解析度來自 Android 標準介面，不需廠商服務。變更後會重新連線 CarPlay。</string>
+    <string name="cluster_display_target_none">未發現公開的 Presentation 顯示器。仍可使用虛擬地圖串流驅動中控卡片與桌面小工具。</string>
     <string name="cluster_safe_area_live_hint">在此拖曳綠色邊界，儀表會同步顯示區域框。儲存後重新連線生效；取消保留當前區域。</string>
     <string name="oem_cluster_map">隱藏原車儀表地圖</string>
     <string name="oem_cluster_map_description">可選：DiPlay 投放期間暫停原車地圖的儀表投放。關閉時不修改原車地圖。組件模式只隱藏儀表投放，整套模式會停用整個原車地圖，停止投放後恢復原狀態。需要已授權的本機 ADB，重新連線後生效。</string>

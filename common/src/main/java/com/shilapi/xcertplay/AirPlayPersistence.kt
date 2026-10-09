@@ -74,6 +74,7 @@ object AirPlayPersistence {
     private const val KEY_SMOOTH_VIDEO = "smooth_video"
     private const val KEY_CLUSTER_MAP = "cluster_map_enabled"
     private const val KEY_ADB_CLUSTER_ACTIVITY = "adb_cluster_activity_enabled"
+    private const val KEY_CLUSTER_DISPLAY_TARGET = "cluster_display_target"
     private const val KEY_CENTER_MAP_OVERLAY = "center_map_overlay"
     private const val KEY_CENTER_MAP_AUTO_HIDE = "center_map_auto_hide"
     private const val KEY_LAUNCHER_MAP_SHARING = "launcher_map_sharing"
@@ -111,7 +112,9 @@ object AirPlayPersistence {
 
     const val DEFAULT_MANUFACTURER = "DiPlay"
     const val DEFAULT_MODEL = "DiPlay"
-    const val DEFAULT_OEM_LABEL = "BYD"
+    const val DEFAULT_OEM_LABEL = "DiPlay"
+    const val BYD_DEFAULT_OEM_LABEL = "BYD"
+    const val GENERIC_DEFAULT_OEM_LABEL = "DiPlay"
     const val DEFAULT_MFI_I2C_PATH = "/dev/i2c-1"
 
     fun loadAmbientDelaySeconds(context: Context): Int =
@@ -478,11 +481,14 @@ object AirPlayPersistence {
             .apply()
     }
 
-    fun loadOemLabel(context: Context): String =
-        context.getSharedPreferences(PREFS, Context.MODE_PRIVATE)
-            .getString(KEY_OEM_LABEL, DEFAULT_OEM_LABEL)
-            // iOS hides the car icon without a label.
-            .orEmpty().ifBlank { DEFAULT_OEM_LABEL }
+    fun loadOemLabel(context: Context): String {
+        val saved = context.getSharedPreferences(PREFS, Context.MODE_PRIVATE)
+            .getString(KEY_OEM_LABEL, null)?.trim().orEmpty()
+        val generic = HeadUnitCapabilities.detect(context).isGeneric
+        if (saved.isNotEmpty() && !(generic && saved == BYD_DEFAULT_OEM_LABEL)) return saved
+        // iOS hides the car icon without a label. Keep the vendor default only on a detected BYD.
+        return if (generic) GENERIC_DEFAULT_OEM_LABEL else BYD_DEFAULT_OEM_LABEL
+    }
 
     fun saveOemLabel(context: Context, oemLabel: String) {
         context.getSharedPreferences(PREFS, Context.MODE_PRIVATE).edit()
@@ -660,6 +666,18 @@ object AirPlayPersistence {
         context.getSharedPreferences(PREFS, Context.MODE_PRIVATE).edit().putBoolean(KEY_CLUSTER_MAP, enabled).apply()
     }
 
+    /** A generic presentation display chosen by the user; null keeps safe automatic selection. */
+    fun loadClusterDisplayTarget(context: Context): String? =
+        context.getSharedPreferences(PREFS, Context.MODE_PRIVATE)
+            .getString(KEY_CLUSTER_DISPLAY_TARGET, null)?.takeIf { it.isNotBlank() }
+
+    fun saveClusterDisplayTarget(context: Context, target: String?) {
+        val edit = context.getSharedPreferences(PREFS, Context.MODE_PRIVATE).edit()
+        if (target.isNullOrBlank()) edit.remove(KEY_CLUSTER_DISPLAY_TARGET)
+        else edit.putString(KEY_CLUSTER_DISPLAY_TARGET, target)
+        edit.apply()
+    }
+
     /** The dashboard map as a card on the centre screen while DiPlay is in the background. */
     fun loadCenterMapOverlay(context: Context): Boolean =
         context.getSharedPreferences(PREFS, Context.MODE_PRIVATE).getBoolean(KEY_CENTER_MAP_OVERLAY, false)
@@ -705,7 +723,9 @@ object AirPlayPersistence {
     fun loadClusterContent(context: Context): CarPlayClusterDisplay.Content =
         context.getSharedPreferences(PREFS, Context.MODE_PRIVATE).getString(KEY_CLUSTER_CONTENT, null)
             ?.let { name -> CarPlayClusterDisplay.Content.entries.firstOrNull { it.name == name } }
-            ?: if (AdbClusterRouter.enabled(context)) CarPlayClusterDisplay.Content.INSTRUMENTS else CarPlayClusterDisplay.Content.MAP
+            ?: if (!HeadUnitCapabilities.detect(context).isGeneric && AdbClusterRouter.enabled(context))
+                CarPlayClusterDisplay.Content.INSTRUMENTS
+            else CarPlayClusterDisplay.Content.MAP
 
     fun saveClusterContent(context: Context, content: CarPlayClusterDisplay.Content) {
         context.getSharedPreferences(PREFS, Context.MODE_PRIVATE).edit().putString(KEY_CLUSTER_CONTENT, content.name).apply()

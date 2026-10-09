@@ -576,12 +576,14 @@
     <string name="widget_hours_minutes">%1$d h %2$02d min</string>
     <string name="center_map_card">Dashboard map on the centre screen</string>
     <string name="shows_the_iphone_s_cluster_map_virtual_stream_description">Requests CarPlay secondary map stream (Stream 111) for center screen floating card and launcher widget embedding on head units without a digital instrument cluster screen.</string>
+    <string name="shows_carplay_map_on_selected_presentation_display">Shows the iPhone map on the Android presentation display you select. This uses the standard Android display API and does not call a vendor service.</string>
     <string name="center_map_card_virtual_description">Shows a 16:9 floating map card on the center screen with natural proportions and pinch-to-zoom support.</string>
     <string name="center_map_auto_hide">Hide floating card over non-home apps</string>
     <string name="center_map_auto_hide_description">Automatically hides the floating card in music players, reverse camera and settings, restoring it on the launcher</string>
     <string name="center_map_auto_hide_active">Auto-hide when leaving home screen: Active</string>
     <string name="center_map_auto_hide_needed">Auto-hide when leaving home screen: Not active. Grant Usage Access via ADB or Accessibility service.</string>
     <string name="center_map_card_description">While DiPlay is in the background, the dashboard map also shows as a card on the home screen: BYD home, map home or your default launcher. Tap the card to open CarPlay, drag it to move it, and pinch it to resize it. The dashboard keeps its map. Needs permission to draw over other apps.</string>
+    <string name="center_map_card_generic_description">While DiPlay is in the background, the selected dashboard map also shows as a card on the head unit home screen. Tap to open CarPlay, drag to move, and pinch to resize. Needs permission to draw over other apps.</string>
     <string name="center_map_overlay_allowed">Draw over other apps: allowed</string>
     <string name="center_map_overlay_missing">Draw over other apps: not allowed. Allow it in the app settings, or over ADB: adb shell appops set %1$s SYSTEM_ALERT_WINDOW allow</string>
     <string name="center_map_usage_allowed">Usage Access: allowed, the card shows only on the home screen</string>
@@ -681,6 +683,10 @@
     <string name="cluster_safe_area_edit">Cluster safe area · edit box</string>
     <string name="cluster_safe_area_reset">Reset cluster safe area</string>
     <string name="cluster_safe_area_hint">Drag the four green boundaries. Saving applies to the next CarPlay connection. A custom box replaces marker offsets; reset restores them.</string>
+    <string name="cluster_display_target">Dashboard display target</string>
+    <string name="cluster_display_target_auto">Automatic · use the only discovered display</string>
+    <string name="cluster_display_target_hint">Choose the head unit\'s instrument or projection display. Names and geometry come from Android; no vendor service is required. Changing this reconnects CarPlay.</string>
+    <string name="cluster_display_target_none">No public presentation display was found. CarPlay can still use the virtual map stream for the centre-screen card and widgets.</string>
     <string name="cluster_safe_area_live_hint">Drag the green edges here and watch the outline on the cluster. Save applies the layout after reconnecting; Cancel keeps your current box.</string>
     <string name="oem_cluster_map">Hide the car’s own cluster map</string>
     <string name="oem_cluster_map_description">Optional: keep the stock map off the cluster while DiPlay projects there. Off leaves it alone. Component mode hides its cluster projection; package mode disables the whole stock map until projection stops. Requires authorized local ADB. Changes apply after reconnecting.</string>

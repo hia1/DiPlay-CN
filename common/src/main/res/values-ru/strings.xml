@@ -731,4 +731,10 @@
     <string name="setup_done_title">Всё готово</string>
     <string name="setup_done_description">Подключите iPhone. Мастер можно снова открыть из настроек.</string>
     <string name="cluster_small_window_card_opacity">Карточка манёвра в мини-окне · прозрачность</string>
+    <string name="shows_carplay_map_on_selected_presentation_display">Показывает карту iPhone на выбранном вами дисплее-презентации Android. Используется стандартный API Android, служба производителя не вызывается.</string>
+    <string name="center_map_card_generic_description">Пока DiPlay в фоне, карта выбранной приборной панели также показывается карточкой на главном экране головного устройства. Нажмите, чтобы открыть CarPlay, перетащите, чтобы переместить, и измените размер двумя пальцами. Нужно разрешение показывать поверх других приложений.</string>
+    <string name="cluster_display_target">Целевой дисплей приборной панели</string>
+    <string name="cluster_display_target_auto">Автоматически · использовать единственный найденный дисплей</string>
+    <string name="cluster_display_target_hint">Выберите дисплей приборной панели или проекции головного устройства. Названия и геометрия берутся из Android; службы производителя не требуются. Изменение переподключает CarPlay.</string>
+    <string name="cluster_display_target_none">Публичный дисплей-презентация не найден. CarPlay всё ещё может использовать виртуальный поток карты для карточки на центральном экране и виджетов.</string>
 </resources>
