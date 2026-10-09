@@ -16,15 +16,14 @@ import java.util.zip.ZipFile
 
 /**
  * In-app updates from this repository's GitHub releases: check the latest release, download its
- * APK into the cache, then hand it to the system package installer. The APK is signed with the
- * project's stable key, so the installer updates the installed app in place and keeps settings.
+ * APK into the cache, then hand it to the system package installer. Releases must use the
+ * same Lodestar signing key, so installer updates apply in place and keep settings.
  */
 object AppUpdate {
-    private const val REPO_PATH = "serein-morii/DiPlay-CN"
+    private const val REPO_PATH = "hia1/DiPlay-CN"
     private const val GITHUB_LATEST = "https://api.github.com/repos/$REPO_PATH/releases/latest"
-    private const val GITEE_LATEST = "https://gitee.com/api/v5/repos/oneeyear/DiPlay-CN/releases/latest"
     private const val ACCEPT = "application/vnd.github+json"
-    private const val USER_AGENT = "DiPlay-CN-Updater"
+    private const val USER_AGENT = "Lodestar-Updater"
     private const val CONNECT_TIMEOUT = 10_000
     private const val READ_TIMEOUT = 20_000
     private const val MAX_APK_BYTES = 200L * 1024 * 1024
@@ -40,13 +39,12 @@ object AppUpdate {
 
     private val main = Handler(Looper.getMainLooper())
     private val worker = Executors.newSingleThreadExecutor { task ->
-        Thread(task, "diplay-update").apply { isDaemon = true }
+        Thread(task, "lodestar-update").apply { isDaemon = true }
     }
 
     private const val CHANNEL_GITHUB = 0
-    private const val CHANNEL_GITEE = 1
-    private const val CHANNEL_MIRROR1 = 2
-    private const val CHANNEL_MIRROR2 = 3
+    private const val CHANNEL_MIRROR1 = 1
+    private const val CHANNEL_MIRROR2 = 2
 
     private const val AUTO_PREFS = "diplay_update"
     private const val KEY_LAST_AUTO_CHECK = "last_auto_check_ms"
@@ -58,7 +56,7 @@ object AppUpdate {
         CHANNEL_MIRROR2 to "https://ghproxy.net/",
     )
 
-    @Volatile private var channel = CHANNEL_GITEE
+    @Volatile private var channel = CHANNEL_GITHUB
 
     /** The settings page stores the chosen channel; the updater picks it up before each call. */
     fun setChannel(choice: Int) {
@@ -99,11 +97,7 @@ object AppUpdate {
             var failure: String? = null
             runCatching {
                 val mirrorPrefix = mirrorPrefixes[channel]
-                val latest = when {
-                    channel == CHANNEL_GITEE -> GITEE_LATEST
-                    mirrorPrefix != null -> mirrorPrefix + GITHUB_LATEST
-                    else -> GITHUB_LATEST
-                }
+                val latest = mirrorPrefix?.let { it + GITHUB_LATEST } ?: GITHUB_LATEST
                 val connection = URL(latest).openConnection() as HttpURLConnection
                 connection.connectTimeout = CONNECT_TIMEOUT
                 connection.readTimeout = READ_TIMEOUT
@@ -155,7 +149,7 @@ object AppUpdate {
         worker.execute {
             runCatching {
                 val directory = File(context.cacheDir, "updates").apply { mkdirs() }
-                val target = File(directory, "diplay-cn-${release.tag}.apk")
+                val target = File(directory, "lodestar-${release.tag}.apk")
                 val downloadUrl = mirrorPrefixes[channel]?.let { it + release.apkUrl } ?: release.apkUrl
                 val connection = URL(downloadUrl).openConnection() as HttpURLConnection
                 connection.instanceFollowRedirects = true

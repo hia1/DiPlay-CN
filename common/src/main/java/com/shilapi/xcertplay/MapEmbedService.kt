@@ -56,7 +56,10 @@ class MapEmbedService : Service() {
         destroyed = true
         stopObservingSharing?.invoke()
         stopObservingSharing = null
-        embeds.values.toList().forEach { it.release() }
+        // Embeds exist only after the Android 11 attach guard, so this keeps lint and cleanup aligned.
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
+            embeds.values.toList().forEach { it.release() }
+        }
         embeds.clear()
         super.onDestroy()
     }
@@ -65,7 +68,17 @@ class MapEmbedService : Service() {
         if (destroyed) return
         val attached = embeds.values.toList()
         embeds.clear()
-        attached.forEach { it.sharingDisabled() }
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
+            attached.forEach { it.sharingDisabled() }
+        }
+    }
+
+    private fun releaseEmbed(client: Messenger) {
+        if (Build.VERSION.SDK_INT < Build.VERSION_CODES.R) {
+            embeds.remove(client.binder)
+            return
+        }
+        embeds.remove(client.binder)?.release()
     }
 
     private fun handle(message: Message) {
@@ -73,8 +86,10 @@ class MapEmbedService : Service() {
         val caller = packageManager.getNameForUid(message.sendingUid) ?: "uid ${message.sendingUid}"
         when (message.what) {
             MSG_ATTACH -> attach(client, caller, message.data)
-            MSG_RESIZE -> embeds[client.binder]?.resize(message.data.getInt(KEY_WIDTH), message.data.getInt(KEY_HEIGHT))
-            MSG_DETACH -> embeds.remove(client.binder)?.release()
+            MSG_RESIZE -> if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
+                embeds[client.binder]?.resize(message.data.getInt(KEY_WIDTH), message.data.getInt(KEY_HEIGHT))
+            }
+            MSG_DETACH -> releaseEmbed(client)
         }
     }
 
@@ -103,7 +118,7 @@ class MapEmbedService : Service() {
             data.getBinder(KEY_HOST_TOKEN)!!, display, data.getInt(KEY_WIDTH), data.getInt(KEY_HEIGHT),
         )
         embeds[client.binder] = embed
-        runCatching { client.binder.linkToDeath({ main.post { embeds.remove(client.binder)?.release() } }, 0) }
+        runCatching { client.binder.linkToDeath({ main.post { releaseEmbed(client) } }, 0) }
         Log.i(TAG, "$caller shows the map ${data.getInt(KEY_WIDTH)}x${data.getInt(KEY_HEIGHT)}")
         send(client, MSG_ATTACHED, Bundle().apply {
             putParcelable(KEY_SURFACE_PACKAGE, embed.surfacePackage)
@@ -120,7 +135,7 @@ class MapEmbedService : Service() {
         try {
             client.send(Message.obtain(null, what).apply { this.data = data })
         } catch (_: RemoteException) {
-            embeds.remove(client.binder)?.release()
+            releaseEmbed(client)
         }
     }
 
