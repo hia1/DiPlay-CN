@@ -1998,6 +1998,12 @@ class DiPlayActivity : ComponentActivity(), AppAppearanceOwner {
                                     ) { it -> getString(R.string.turn_card_overlay_size_option, it) }
                                         .also { it.onSave = { v -> AirPlayPersistence.saveClusterSmallWindowCardSizePercent(this, v); smallWindowPlacementPreview?.invalidate() } })
                                     card.addView(overlaySliderRow(
+                                        getString(R.string.cluster_small_window_card_opacity),
+                                        ClusterTurnCardOverlay.opacityPercents,
+                                        AirPlayPersistence.loadClusterSmallWindowCardOpacityPercent(this),
+                                    ) { it -> getString(R.string.turn_card_overlay_opacity_option, it) }
+                                        .also { it.onSave = { v -> AirPlayPersistence.saveClusterSmallWindowCardOpacityPercent(this, v) } })
+                                    card.addView(overlaySliderRow(
                                         getString(R.string.cluster_small_window_card_horizontal),
                                         ClusterTurnCardOverlay.smallWindowXPercents,
                                         AirPlayPersistence.loadClusterSmallWindowCardXPercent(this),
@@ -2183,12 +2189,6 @@ class DiPlayActivity : ComponentActivity(), AppAppearanceOwner {
             card.addView(label(getString(R.string.cn_features_body), 16, TEXT).apply {
                 setPadding(0, 0, 0, dp(8))
             })
-                                    card.addView(overlaySliderRow(
-                                        getString(R.string.cluster_small_window_card_opacity),
-                                        ClusterTurnCardOverlay.opacityPercents,
-                                        AirPlayPersistence.loadClusterSmallWindowCardOpacityPercent(this),
-                                        ) { it -> getString(R.string.turn_card_overlay_opacity_option, it) }
-                                            .also { it.onSave = { v -> AirPlayPersistence.saveClusterSmallWindowCardOpacityPercent(this, v) } })
         }
         section(aboutRight, getString(R.string.cn_changelog_title)) { card ->
             card.addView(label(cnChangelogText(), 15, MUTED))

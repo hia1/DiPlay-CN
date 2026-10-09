@@ -2283,13 +2283,15 @@ class CarPlayHostActivity : ComponentActivity() {
                 if (child.tag == "settings-category") { groups.add(mutableListOf(child)); open = true }
                 else if (open) groups.last().add(child) else hero.add(child)
             }
+            // Detach first. addView() while the child still belongs to `content` throws
+            // IllegalStateException on the car (1920-wide), which is the connect crash.
+            for (i in content.childCount - 1 downTo 0) content.removeViewAt(i)
             var leftW = 0
             var rightW = 0
             groups.forEach { group ->
                 val target = if (leftW <= rightW) { leftW += group.size; columnLeft } else { rightW += group.size; columnRight }
                 group.forEach { v -> target.addView(v) }
             }
-            for (i in content.childCount - 1 downTo 0) content.removeViewAt(i)
             hero.forEach(content::addView)
             val row = LinearLayout(this).apply { orientation = LinearLayout.HORIZONTAL }
             row.addView(columnLeft, LinearLayout.LayoutParams(0, ViewGroup.LayoutParams.WRAP_CONTENT, 1f))

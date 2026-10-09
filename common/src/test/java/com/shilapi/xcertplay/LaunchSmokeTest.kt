@@ -23,4 +23,13 @@ class LaunchSmokeTest {
         controller.create().start().resume()
         controller.get()
     }
+
+    // Han DM-i / DiLink 5 is 1920-wide; the two-column menu reflow only runs there.
+    @Test
+    @Config(sdk = [29], qualifiers = "en-w1920dp-h1080dp-mdpi")
+    fun carPlayHostLaunchesOnWideHeadUnit() {
+        val controller = Robolectric.buildActivity(CarPlayHostActivity::class.java)
+        controller.create().start().resume()
+        controller.get()
+    }
 }

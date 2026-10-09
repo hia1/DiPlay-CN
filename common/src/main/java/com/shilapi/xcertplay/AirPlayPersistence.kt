@@ -1252,6 +1252,7 @@ object AirPlayPersistence {
     fun saveClusterTurnCardOpacityPercent(context: Context, percent: Int) {
         context.getSharedPreferences(PREFS, Context.MODE_PRIVATE).edit()
             .putInt(KEY_CLUSTER_TURN_CARD_OPACITY, percent.coerceIn(20, 100)).apply()
+        overlaySettingsListener?.invoke()
     }
 
     fun saveClusterSmallWindowCardOpacityPercent(context: Context, percent: Int) {
