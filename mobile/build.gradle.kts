@@ -9,6 +9,13 @@ plugins {
 val localAuthenticationAssets = providers.environmentVariable("DIPLAY_AUTH_ASSETS_DIR")
     .orNull?.let { file(it).canonicalFile }
 
+// Release signing stays local (or comes from CI secrets) and is never committed. A plain source
+// checkout has neither, so it must still configure and build: only a request that actually needs
+// the release key fails, and only when the key is missing.
+val releaseKeystorePath = providers.environmentVariable("ANDROID_KEYSTORE_PATH").orNull
+val releaseSigningProperties = rootProject.file("signing/lodestar-release.properties")
+val hasReleaseSigning = releaseKeystorePath != null || releaseSigningProperties.isFile
+
 android {
     namespace = "com.shilapi.xcertplay"
     compileSdk {
@@ -28,24 +35,21 @@ android {
     localAuthenticationAssets?.let { sourceSets.getByName("main").assets.srcDir(it) }
 
     signingConfigs {
-        create("release") {
-            val storePath = providers.environmentVariable("ANDROID_KEYSTORE_PATH").orNull
-            if (storePath != null) {
-                storeFile = file(storePath)
-                storePassword = providers.environmentVariable("ANDROID_KEYSTORE_PASSWORD").getOrElse("")
-                keyAlias = providers.environmentVariable("ANDROID_KEY_ALIAS").getOrElse("")
-                keyPassword = providers.environmentVariable("ANDROID_KEY_PASSWORD").getOrElse("")
-            } else {
-                // Release signing stays local (or comes from CI secrets). Never commit the store,
-                // so a source checkout builds debug but cannot accidentally publish a foreign key.
-                val signingProperties = rootProject.file("signing/lodestar-release.properties")
-                check(signingProperties.isFile) { "Release signing is not configured: create signing/lodestar-release.properties" }
-                val values = Properties().apply { signingProperties.inputStream().use(::load) }
-                fun required(key: String) = requireNotNull(values.getProperty(key)) { "Missing release signing property: $key" }
-                storeFile = rootProject.file(required("storeFile"))
-                storePassword = required("storePassword")
-                keyAlias = required("keyAlias")
-                keyPassword = required("keyPassword")
+        if (hasReleaseSigning) {
+            create("release") {
+                if (releaseKeystorePath != null) {
+                    storeFile = file(releaseKeystorePath)
+                    storePassword = providers.environmentVariable("ANDROID_KEYSTORE_PASSWORD").getOrElse("")
+                    keyAlias = providers.environmentVariable("ANDROID_KEY_ALIAS").getOrElse("")
+                    keyPassword = providers.environmentVariable("ANDROID_KEY_PASSWORD").getOrElse("")
+                } else {
+                    val values = Properties().apply { releaseSigningProperties.inputStream().use(::load) }
+                    fun required(key: String) = requireNotNull(values.getProperty(key)) { "Missing release signing property: $key" }
+                    storeFile = rootProject.file(required("storeFile"))
+                    storePassword = required("storePassword")
+                    keyAlias = required("keyAlias")
+                    keyPassword = required("keyPassword")
+                }
             }
         }
     }
@@ -57,7 +61,8 @@ android {
             optimization {
                 enable = false
             }
-            signingConfig = signingConfigs.getByName("release")
+            // Unset means an unsigned release APK, which is what a source-only checkout produces.
+            if (hasReleaseSigning) signingConfig = signingConfigs.getByName("release")
         }
     }
     compileOptions {
