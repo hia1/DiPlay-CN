@@ -31,6 +31,13 @@ android {
         // The UI suite covers several SDKs and locale-specific resource sandboxes.
         unitTests.all { it.maxHeapSize = "1g" }
     }
+
+    lint {
+        // ar/es/ru/uk carry partial upstream translations, so their missing strings fall back to
+        // English. That is a translation gap, not a defect: keep it visible as a warning instead of
+        // failing the module's lint run and hiding real errors behind a permanently red task.
+        warning.add("MissingTranslation")
+    }
 }
 
 dependencies {

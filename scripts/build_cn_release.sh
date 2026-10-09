@@ -131,7 +131,8 @@ echo "sdk.dir=$ANDROID_HOME" > "$WORK/local.properties"
 
 # --- official identity (direct, then cross-border mirrors) --------------------------------
 log "fetching official $OFFICIAL_TAG APK"
-OFFICIAL_URL="https://github.com/shihabal3amri/DiPlay/releases/download/$OFFICIAL_TAG/DiPlay-$OFFICIAL_TAG.apk"
+# Upstream tags the APK without the leading "v" (DiPlay-0.2.14.apk under tag v0.2.14).
+OFFICIAL_URL="https://github.com/shihabal3amri/DiPlay/releases/download/$OFFICIAL_TAG/DiPlay-${OFFICIAL_TAG#v}.apk"
 ok=""
 for u in "$OFFICIAL_URL" "https://gh-proxy.com/$OFFICIAL_URL" "https://ghproxy.net/$OFFICIAL_URL"; do
   if curl -fsSL --retry 3 --max-time 900 -o /tmp/official.apk "$u"; then ok=1; break; fi
